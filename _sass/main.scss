@@ -86,6 +86,27 @@ footer {
   font-weight: normal;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+.coffee-summary-table th {
+  text-align: left;
+  padding-right: 40px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.coffee-summary-table td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-align: left;
+}
+
+.coffee-summary-table tr {
+  border-bottom: 1px solid #535970;
+}
+
 /* 04 Color and contrast */
 
 body {

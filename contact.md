@@ -5,7 +5,7 @@ title: Thomas' Contact
 
 ## Contact Me
 
-Email is the best way to reach me, preferably, using my PGP Public Key listed below.
+Email is the best way to reach me, preferably, using my PGP Public Key linked below.
 
 [Email](mailto:tom@tomjack.ca): tom@tomjack.ca
 

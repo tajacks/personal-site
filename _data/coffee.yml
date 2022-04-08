@@ -1,0 +1,48 @@
+- name: 'Kenya Nyeri Hill AA'
+  roaster: 'momos coffee'
+  brewed_on: 2022-02-27
+  ground_coffee: 20.5
+  water: 350
+  method: origami
+  country: Kenya
+  masl: [ 1800, 2200 ]
+  process: washed
+  varietals: [ SL28, 'Ruiru 11', Batian ]
+  rating: 75
+  id: 1
+- name: 'San Francisco'
+  roaster: 'Process Coffee'
+  brewed_on: 2022-03-19
+  ground_coffee: 20.5
+  water: 350
+  method: origami
+  country: 'Costa Rica'
+  masl: [ 1750 ]
+  process: natural
+  varietals: [ Caturra, Catuai ]
+  rating: 75
+  id: 2
+- name: 'Rootbeer Float'
+  roaster: Luna
+  brewed_on: 2022-03-26
+  ground_coffee: 23.5
+  water: 400
+  method: origami
+  country: Honduras
+  masl: [ ]
+  process: washed
+  varietals: [ Parainema ]
+  rating: 80
+  id: 3
+- name: 'Benjamin Paz Santa Barbara'
+  roaster: Luna
+  brewed_on: 2022-04-03
+  ground_coffee: 23.5
+  water: 400
+  method: origami
+  country: Honduras
+  masl: [ ]
+  process: Honey
+  varietals: [ Pacas ]
+  rating: 62
+  id: 4

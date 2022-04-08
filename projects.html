@@ -1,0 +1,12 @@
+---
+layout: default
+title: Thomas' Projects
+---
+<h2>Projects</h2>
+<div class="project-summary">
+    {% for item in site.data.projects %}
+        <h3>{{ item.name }} <a href="{{ item.link }}" target="_blank">>></a></h3>
+        <p>{{ item.description }}</p>
+        <br>
+    {% endfor %}
+</div>

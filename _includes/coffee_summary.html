@@ -1,0 +1,44 @@
+{% for coffee in site.data.coffee %}
+{% if coffee.id == page.coffee_id %}
+<div class="coffee-summary">
+    <table class="coffee-summary-table">
+        <tr>
+            <th colspan="2" style="text-align: center; font-weight: lighter">Coffee Facts</th>
+        </tr>
+        <tr>
+            <th>Roaster</th>
+            <td>{{ coffee.roaster }}</td>
+        </tr>
+        <tr>
+            <th>Country</th>
+            <td>{{ coffee.country }}</td>
+        </tr>
+        <tr>
+            <th>Process</th>
+            <td>{{ coffee.process }}</td>
+        </tr>
+        <tr>
+            <th>MASL</th>
+            <td>{{ coffee.masl | join: ' - '}}</td>
+        </tr>
+        <tr>
+            <th>Varietals</th>
+            <td>{{ coffee.varietals | join: ', ' }}</td>
+        </tr>
+        <tr>
+            <th>Brew Method</th>
+            <td>{{ coffee.method }}</td>
+        </tr>
+        <tr>
+            <th>Ratio (g)</th>
+            <td>{{ coffee.water | divided_by: coffee.ground_coffee | round: 1 }}</td>
+        </tr>
+
+        <tr>
+            <th>Rating</th>
+            <td>{{ coffee.rating }}</td>
+        </tr>
+    </table>
+</div>
+{% endif %}
+{% endfor %}
