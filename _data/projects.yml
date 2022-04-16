@@ -1,3 +1,6 @@
 - name: LightSpeed
   description: A lightweight Jekyll theme (that this site is built on).
   link: https://github.com/tajacks/lightspeed
+- name: PHP MiniVC
+  description: A mini MVC framework that I constructed and adapted to learn how an MVC framework operates in PHP.
+  link: https://github.com/tajacks/php-minivc

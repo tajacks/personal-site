@@ -15,7 +15,7 @@ header,
 footer,
 main {
   margin: 0 auto;
-  max-width: 45em;
+  max-width: 47em;
 }
 
 /* 02 Font family */
@@ -70,8 +70,12 @@ footer {
   line-height: 1;
 }
 
+th, td {
+  padding: 10px 20px 20px 30px;
+}
+
 .post-summary {
-  line-height: 10px;
+  line-height: 25px;
 }
 
 .post-summary h3 {
@@ -79,7 +83,7 @@ footer {
 }
 
 .category-summary {
-  line-height: 10px;
+  line-height: 25px;
 }
 
 .category-summary h3 {
@@ -105,7 +109,7 @@ table {
   text-align: left;
 }
 
-.coffee-summary-table tr {
+tr {
   border-bottom: 1px solid #535970;
 }
 
