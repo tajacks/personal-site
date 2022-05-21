@@ -58,3 +58,15 @@
   varietals: [ Heirloom ]
   rating: 89
   id: 5
+- name: 'Rwanda - Filter'
+  roaster: 'FriedHats'
+  brewed_on: 2022-05-08
+  ground_coffee: 23.5
+  water: 400
+  method: origami
+  country: Rwanda
+  masl: [1800, 2110 ]
+  process: 'Experimental Natural'
+  varietals: [ 'Red Bourbon' ]
+  rating: 90
+  id: 6
