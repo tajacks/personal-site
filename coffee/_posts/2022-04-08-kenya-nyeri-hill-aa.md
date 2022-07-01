@@ -3,6 +3,7 @@ layout: post
 author: tom
 title: Kenya Nyeri Hill AA
 coffee_id: 1
+tags: coffee
 ---
 
 {% include coffee_summary.html %}

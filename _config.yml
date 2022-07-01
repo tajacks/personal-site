@@ -6,11 +6,17 @@ author: tajacks
 timezone: America/Toronto
 timezone_short: ET
 
+# Styling
+sass:
+  sass_dir: _sass
+  style: expanded # compressed, compact, expanded or compressed
+
+
 # Paginate
 pagination:
   enabled: true
   per_page: 10
-  indexpage: 'posts'
+  indexpage: 'index'
   sort_field: 'date'
   sort_reverse: true
 
@@ -29,3 +35,4 @@ exclude: [ 'README.md', 'COPYING', 'drafts', 'templates' ]
 plugins:
   - jekyll-feed
   - jekyll-paginate-v2
+  - jekyll-seo-tag

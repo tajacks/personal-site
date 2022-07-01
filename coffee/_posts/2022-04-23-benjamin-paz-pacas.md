@@ -3,6 +3,7 @@ layout: post
 author: tom
 title: Benjamin Paz Pacas
 coffee_id: 4
+tags: coffee
 ---
 
 {% include coffee_summary.html %}

@@ -2,7 +2,7 @@
 layout: post
 author: tom
 title: Calculating IPv4 Addresses with Java Bit Shift Operators
-tags: java
+tags: java bitshift java-ipv4 networking
 ---
 
 While working on a personal project that manipulates IPv4 addresses and subnets, I ran into bit shifting as a way of 

@@ -3,6 +3,7 @@ layout: post
 author: tom
 title: FriedHats Rwanda
 coffee_id: 6
+tags: coffee
 ---
 
 {% include coffee_summary.html %}

@@ -3,6 +3,7 @@ layout: post
 author: tom
 title: Root Beer Float
 coffee_id: 3
+tags: coffee
 ---
 
 {% include coffee_summary.html %}

@@ -2,13 +2,15 @@
 layout: default
 title: Thomas' Projects
 ---
-<h2>Projects</h2>
+
 <div class="project-summary">
+    <h2>Projects</h2>
     {% for item in site.data.projects %}
-        <h3>{{ item.name }} <a href="{{ item.link }}" target="_blank">>></a></h3>
+        <span class="project-item">{{ item.name }} <a href="{{ item.link }}" target="_blank">&gt;&gt;</a></span>
         <p>{{ item.description }}</p>
         <br>
     {% endfor %}
 </div>
 
 My GitHub: <a href="https://github.com/tajacks" target="_blank">Link</a>
+</div>

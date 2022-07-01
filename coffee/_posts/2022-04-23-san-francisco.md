@@ -3,6 +3,7 @@ layout: post
 author: tom
 title: San Francisco
 coffee_id: 2
+tags: coffee
 ---
 
 {% include coffee_summary.html %}
