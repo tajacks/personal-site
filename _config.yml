@@ -11,6 +11,8 @@ sass:
   sass_dir: _sass
   style: expanded # compressed, compact, expanded or compressed
 
+#seo
+keywords: ['java', 'coffee', 'networking']
 
 # Paginate
 pagination:

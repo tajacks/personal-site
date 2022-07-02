@@ -3,7 +3,7 @@ layout: default
 title: Thomas' Contact
 ---
 
-{: .contact-summary }
+{: .padded }
 ## About
 
 I'm a full stack software developer with a background in networking. Here are some of the things I find interesting:
