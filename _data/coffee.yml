@@ -70,3 +70,15 @@
   varietals: [ 'Red Bourbon' ]
   rating: 90
   id: 6
+- name: 'Kaliluni Machakos'
+  roaster: 'Solberg & Hansen'
+  brewed_on: 2022-08-20
+  ground_coffee: 23.5
+  water: 400
+  method: origami
+  country: Kenya
+  masl: [ 1700, 1900 ]
+  process: 'Washed'
+  varietals: [ 'SL24', 'SL28', 'ruiru 11', 'batian' ]
+  rating: 92
+  id: 7
