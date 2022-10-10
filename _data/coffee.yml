@@ -82,3 +82,15 @@
   varietals: [ 'SL24', 'SL28', 'ruiru 11', 'batian' ]
   rating: 92
   id: 7
+- name: 'Hamasho'
+  roaster: 'Little Wolf'
+  brewed_on: 2022-10-03
+  ground_coffee: 23.5
+  water: 400
+  method: origami
+  country: Ethiopia
+  masl: [ 2300 ]
+  process: 'Washed'
+  varietals: [ 'Ethiopian Landraces' ]
+  rating: 89
+  id: 8
