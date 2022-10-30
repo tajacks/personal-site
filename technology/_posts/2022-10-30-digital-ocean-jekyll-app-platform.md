@@ -1,7 +1,7 @@
 ---
 layout: post
 author: tom
-title: Kotlin + Gradle w/ Kotlin DSL + Spotless
+title: DigitalOcean Jekyll Static Sites 404s
 tags: digitalocean jekyll app-platform static-site 404 not-found
 ---
 
