@@ -1,7 +1,7 @@
 ---
 layout: post
 author: tom
-title: DigitalOcean Jekyll Static Sites 404s
+title: Jekyll Layout for Digital Ocean Static Sites
 tags: digitalocean jekyll app-platform static-site 404 not-found
 ---
 
