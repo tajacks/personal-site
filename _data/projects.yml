@@ -4,6 +4,9 @@
 - name: PHP MiniVC
   description: A mini MVC framework that I constructed and adapted to learn how an MVC framework operates in PHP.
   link: https://github.com/tajacks/php-minivc
+- name: Eulixir
+  description: A handy boiler-plate generator & benchmarker for projecteuler.net puzzles
+  link: https://github.com/tajacks/eulixir
 - name: OpenSky API
   description: A fork of the official OpenSky API wrapper, rewritten for Java 17.
   link: https://github.com/tajacks/opensky-api

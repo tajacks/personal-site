@@ -13,7 +13,7 @@ is `build.gradle.kts`.
 
 Most recent version can be found [here](https://plugins.gradle.org/plugin/com.diffplug.spotless){:target="_blank"}.
 
-```
+```kotlin
 plugins {
     kotlin("jvm") version "1.7.10"
     id("com.diffplug.spotless") version "6.7.2"
@@ -25,7 +25,7 @@ plugins {
 When using Kotlin as your DSL, you need to change the documentation on GitHub to use method calls 
 and double-quoted strings.
 
-```
+```kotlin
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin { ktlint() }
     kotlinGradle {
@@ -37,7 +37,7 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 
 ### Example build.gradle.kts
 
-```
+```kotlin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {

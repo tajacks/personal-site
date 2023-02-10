@@ -10,8 +10,7 @@ I'm a full stack software developer with a background in networking. Here are so
 
 <br>
 
-- Automation
-- JVM Languages
+- Functional Programming
 - Accessible Privacy & Encryption
 - Single Origin Coffee
 - Timekeeping

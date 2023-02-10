@@ -965,7 +965,7 @@ public class DLXBoard {
 
 Starting with construction:
 
-```
+```java
 public DLXBoard(ExactCoverMatrix matrix) {
   this.header        = ColumnNode.fromName(HEADER_LABEL);
   this.matrix        = matrix;
@@ -980,7 +980,7 @@ The board keeps an instance variable `List<ColumnNode> columns` which represents
 store any reference to "rows", as they can be determined from the columns `DancingNode`'s. The call to 
 `buildColumnsAndNodes()` is also part of the constructor:
 
-```
+```java
 private List<ColumnNode> buildColumnsAndNodes() {
   List<ColumnNode> columns = new ArrayList<>();
 
