@@ -12,7 +12,7 @@ sass:
   style: expanded # compressed, compact, expanded or compressed
 
 #seo
-keywords: ['java', 'coffee', 'networking']
+keywords: ['java', 'coffee', 'elixir', 'functional', 'programming']
 
 # Paginate
 pagination:

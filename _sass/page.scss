@@ -8,7 +8,7 @@ html {
 /* 01 Font family */
 
 body {
-  font-family: 'Roboto', 'Courier New', sans-serif;
+  font-family: 'Courier New', 'Courier', monospace;
 }
 
 /* 03 Spacing */
@@ -22,6 +22,17 @@ body {
 
 header h1, h5 {
   display: inline;
+}
+
+.main-content {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  line-height: 30px;
+}
+
+div.main-content h2 {
+  padding-top: 15px;
+  padding-bottom: 5px;
 }
 
 /* 04 Color and contrast */

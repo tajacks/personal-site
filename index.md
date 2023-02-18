@@ -3,7 +3,6 @@ layout: default
 title: Thomas' Contact
 ---
 
-{: .padded }
 ## About
 
 I'm a full stack software developer with a background in networking. Here are some of the things I find interesting:
@@ -20,6 +19,10 @@ I'm a full stack software developer with a background in networking. Here are so
   
 If you also find any of these interesting, or, if you find them terribly boring, please feel free to reach out using 
 the contact info below to discuss how interesting or terribly boring they are further.  
+
+<br>
+
+If something on this site helped out, or you just found it interesting, please let me know! I'd love to hear about it.
 
 <br>
 

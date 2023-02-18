@@ -8,7 +8,11 @@ tags: elixir lists erlang list-head shift-list list-tail
 Lists in Elixir are linked lists. I recently had a situation where I needed to shift all elements in the 
 list one to the right, bringing the last element to the list as the new first element (head).
 
+<br>
+
 Here are the three ways I propose to right-shift a list, bringing the last element to the new head.
+
+<br>
 
 #### TLDR;
 If you need to shift a list to the right and bring the last element to the new head position, this seems to
@@ -50,16 +54,24 @@ defmodule Benchmark do
 end
 ```
 
+<br>
+
 The logic for the first two functions are identical. `shift/1` uses 
 [Kernel.then/2](ttps://hexdocs.pm/elixir/main/Kernel.html#then/2) to pattern match in
 the pipeline by using a function declared in the pipeline. Both the initial two first reverse the list,
 get the head (original last element) of that list, and construct a new list where the head is the element
 just retrieved and the tail is the remainder of the reversed list, re-reversed (back in order).
 
+<br>
+
 The third method uses Elixir List function. It pops the last element off the list and returns the last element
 as the new head followed by the remainder.
 
+<br>
+
 All are very simple, but require list traversal to complete.
+
+<br>
 
 To test all three methods, ranges (to lists) with max sizes `100` and `10_000_000` were used. I ran the benchmarks 
 using Benchee.
