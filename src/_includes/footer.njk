@@ -1,0 +1,15 @@
+<footer class="border-t border-border py-8 mt-auto">
+  <div class="container-narrow">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-muted">
+      <p>&copy; {{ "" | year }} {{ site.author.name }}</p>
+      <div class="flex items-center gap-4">
+        <a href="{{ site.author.github }}" class="hover:text-text-secondary transition-colors" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+        <a href="mailto:{{ site.author.email }}" class="hover:text-text-secondary transition-colors">
+          Email
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
