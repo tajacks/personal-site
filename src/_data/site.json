@@ -1,0 +1,16 @@
+{
+  "title": "Thomas Jack",
+  "description": "Personal website of Thomas Jack",
+  "url": "https://tomjack.ca",
+  "author": {
+    "name": "Thomas Jack",
+    "email": "tom@tomjack.ca",
+    "github": "https://github.com/tajacks"
+  },
+  "nav": [
+    { "text": "Home", "url": "/" },
+    { "text": "Bookshelf", "url": "/bookshelf/" },
+    { "text": "Notes", "url": "/notes/" },
+    { "text": "Resume", "url": "/resume/" }
+  ]
+}

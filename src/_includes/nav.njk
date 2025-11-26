@@ -1,0 +1,18 @@
+<header class="border-b border-border">
+  <nav class="container-narrow py-4">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <a href="/" class="text-text-primary font-semibold hover:text-accent-400 transition-colors">
+        {{ site.title }}
+      </a>
+      <ul class="flex flex-wrap items-center gap-3 sm:gap-6 text-sm">
+        {% for item in site.nav %}
+        <li>
+          <a href="{{ item.url }}" class="nav-link{% if page.url == item.url %} nav-link-active{% endif %}">
+            {{ item.text }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </nav>
+</header>

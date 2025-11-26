@@ -1,0 +1,115 @@
+---
+layout: base.njk
+title: Bookshelf
+---
+<div class="container-narrow">
+  <h1 class="text-3xl font-bold text-text-primary mb-2">/bookshelf</h1>
+  <p class="text-text-secondary mb-4">
+    What I'm reading and have read.
+  </p>
+
+  <div class="flex flex-wrap gap-4 text-sm text-text-muted mb-8">
+    <span>📖 Fiction</span>
+    <span>💻 Technical</span>
+    <span>💡 Self-Help</span>
+    <span>🤔 Philosophy</span>
+    <span>📚 Non-Fiction</span>
+    <span>🔬 Science</span>
+    <span>☕ Food & Drink</span>
+  </div>
+
+  {% set reading = books | byStatus("reading") %}
+  {% set finished = books | byStatus("finished") %}
+  {% set abandoned = books | byStatus("abandoned") %}
+
+  {% if reading | length > 0 %}
+  <section class="mb-10">
+    <h2 class="section-heading">Currently Reading</h2>
+    <div class="space-y-4">
+      {% for book in reading %}
+      <div class="card">
+        <div class="flex items-start gap-3">
+          <span class="text-2xl" title="{{ book.category }}">{{ book.category | bookIcon }}</span>
+          <div class="flex-1">
+            <h3 class="text-lg font-semibold text-text-primary">{{ book.title }}</h3>
+            <p class="text-text-muted text-sm">{{ book.author }}</p>
+            {% if book.thoughts %}
+            <p class="text-text-secondary text-sm mt-2">{{ book.thoughts }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if finished | length > 0 %}
+  <section class="mb-10">
+    <h2 class="section-heading">Finished</h2>
+    {% set years = finished | bookYears %}
+    {% for year in years %}
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-text-muted mb-4">{{ year }}</h3>
+      <div class="space-y-4">
+        {% for book in finished | byYear(year) %}
+        <div class="border-l-2 border-border pl-4">
+          <div class="flex items-start gap-2">
+            <span class="text-lg" title="{{ book.category }}">{{ book.category | bookIcon }}</span>
+            <div class="flex-1">
+              <h4 class="font-semibold text-text-primary">{{ book.title }}</h4>
+              <p class="text-text-muted text-sm">{{ book.author }}</p>
+              {% if book.thoughts %}
+              <p class="text-text-secondary text-sm mt-1">{{ book.thoughts }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    {# Books without a year #}
+    {% set unknownYear = finished | withoutYear %}
+    {% if unknownYear | length > 0 %}
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-text-muted mb-4">Date Unknown</h3>
+      <div class="space-y-4">
+        {% for book in unknownYear %}
+        <div class="border-l-2 border-border pl-4">
+          <div class="flex items-start gap-2">
+            <span class="text-lg" title="{{ book.category }}">{{ book.category | bookIcon }}</span>
+            <div class="flex-1">
+              <h4 class="font-semibold text-text-primary">{{ book.title }}</h4>
+              <p class="text-text-muted text-sm">{{ book.author }}</p>
+              {% if book.thoughts %}
+              <p class="text-text-secondary text-sm mt-1">{{ book.thoughts }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {% if abandoned | length > 0 %}
+  <section>
+    <h2 class="section-heading">Abandoned</h2>
+    <div class="space-y-3">
+      {% for book in abandoned %}
+      <div class="flex items-start gap-2 text-text-muted">
+        <span title="{{ book.category }}">{{ book.category | bookIcon }}</span>
+        <div>
+          <span class="text-text-secondary">{{ book.title }}</span> by {{ book.author }}
+          {% if book.thoughts %}<span class="text-sm"> — {{ book.thoughts }}</span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>

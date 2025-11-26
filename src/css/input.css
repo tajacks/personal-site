@@ -1,0 +1,243 @@
+@import "tailwindcss";
+
+/* Site color palette */
+@theme {
+  --color-bg-primary: #22262a;
+  --color-bg-secondary: #2a2f34;
+  --color-bg-tertiary: #363c42;
+  --color-border: #363c42;
+  --color-border-subtle: #464d54;
+  --color-text-primary: #f0f2f3;
+  --color-text-secondary: #c0c6cb;
+  --color-text-muted: #7a838a;
+  /* Deep lake blue accent */
+  --color-accent-400: #5a8fa8;
+  --color-accent-500: #4a7f98;
+  --color-accent-600: #6a9fb8;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg-primary text-text-secondary antialiased;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-text-primary font-semibold;
+  }
+
+  a {
+    @apply text-accent-400 hover:text-accent-600 transition-colors;
+  }
+
+  p {
+    @apply leading-relaxed;
+  }
+}
+
+/* Component styles */
+@layer components {
+  .container-narrow {
+    @apply max-w-2xl mx-auto px-6;
+  }
+
+  .nav-link {
+    @apply text-text-muted hover:text-text-primary transition-colors py-2;
+  }
+
+  .nav-link-active {
+    @apply text-accent-400;
+  }
+
+  .card {
+    @apply bg-bg-secondary border border-border rounded-lg p-6;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-accent-500 text-bg-primary hover:bg-accent-400;
+  }
+
+  .btn-outline {
+    @apply border border-border text-text-secondary hover:border-border-subtle hover:text-text-primary;
+  }
+
+  .section-heading {
+    @apply text-xl font-semibold text-text-primary mb-4;
+  }
+
+  .link-list {
+    @apply space-y-3;
+  }
+
+  .link-list a {
+    @apply block text-text-secondary hover:text-accent-400 transition-colors;
+  }
+
+  .divider {
+    @apply border-t border-border my-8;
+  }
+
+  /* Prose styling for markdown content */
+  .prose {
+    @apply text-text-secondary;
+  }
+
+  .prose p {
+    @apply mb-6 leading-relaxed;
+  }
+
+  .prose h2 {
+    @apply text-xl font-semibold text-text-primary mt-8 mb-4;
+  }
+
+  .prose h3 {
+    @apply text-lg font-semibold text-text-primary mt-6 mb-3;
+  }
+
+  .prose ul {
+    @apply mb-6 space-y-2 list-disc list-inside;
+  }
+
+  .prose ol {
+    @apply mb-6 space-y-2 list-decimal list-inside;
+  }
+
+  .prose li {
+    @apply text-text-secondary;
+  }
+
+  .prose em {
+    @apply italic;
+  }
+
+  .prose strong {
+    @apply font-semibold text-text-primary;
+  }
+
+  /* Inline code (not in pre blocks) */
+  .prose :not(pre) > code {
+    @apply text-sm bg-bg-tertiary px-1.5 py-0.5 rounded;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-border pl-4 italic text-text-muted my-6;
+  }
+
+  /* Code blocks */
+  .prose pre {
+    @apply bg-bg-tertiary rounded-lg p-4 overflow-x-auto my-6;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0 text-sm;
+    display: block;
+  }
+
+}
+
+/* Prism.js syntax highlighting theme (dark) */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #f0f2f3;
+  background: none;
+  font-family: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  tab-size: 4;
+  hyphens: none;
+}
+
+pre[class*="language-"] {
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+  border-radius: 0.5em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background: #2a2f34;
+}
+
+:not(pre) > code[class*="language-"] {
+  padding: 0.1em;
+  border-radius: 0.3em;
+  white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #7a838a;
+}
+
+.token.punctuation {
+  color: #c0c6cb;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #f07178;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #c3e88d;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #5a8fa8;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #c792ea;
+}
+
+.token.function,
+.token.class-name {
+  color: #82aaff;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #f78c6c;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
