@@ -1,0 +1,129 @@
+# Bookshelf
+# status: reading, finished, abandoned
+# category: fiction, technical, self-help, philosophy, non-fiction, science, food-drink
+# year: YYYY or omit if you don't remember when you read it
+
+# 2022
+- title: "Modern Java in Action"
+  author: "Raoul-Gabriel Urma, Mario Fusco, and Alan Mycroft"
+  year: 2022
+  status: finished
+  category: technical
+
+- title: "Functional Programming in Java"
+  author: "Pierre-Yves Saumont"
+  year: 2022
+  status: finished
+  category: technical
+
+- title: "Effective Java"
+  author: "Joshua Bloch"
+  year: 2022
+  status: finished
+  category: technical
+
+# 2023
+- title: "Elixir in Action"
+  author: "Saša Jurić"
+  year: 2023
+  status: finished
+  category: technical
+
+# 2024
+- title: "A Mind for Numbers"
+  author: "Barbara Oakley"
+  year: 2024
+  status: finished
+  category: self-help
+
+# 2025
+- title: "Thinking, Fast and Slow"
+  author: "Daniel Kahneman"
+  year: 2025
+  status: reading
+  category: self-help
+
+- title: "Structure and Interpretation of Computer Programs"
+  author: "Harold Abelson and Gerald Jay Sussman"
+  year: 2025
+  status: reading
+  category: technical
+
+- title: "The Overstory"
+  author: "Richard Powers"
+  year: 2025
+  status: finished
+  category: fiction
+
+- title: "Slow Productivity"
+  author: "Cal Newport"
+  year: 2025
+  status: finished
+  category: self-help
+
+# Date Unknown
+- title: "Sapiens: A Brief History of Humankind"
+  author: "Yuval Noah Harari"
+  status: finished
+  category: non-fiction
+
+- title: "21 Lessons for the 21st Century"
+  author: "Yuval Noah Harari"
+  status: finished
+  category: philosophy
+
+- title: "Homo Deus: A Brief History of Tomorrow"
+  author: "Yuval Noah Harari"
+  status: finished
+  category: non-fiction
+
+- title: "What If? Serious Scientific Answers to Absurd Hypothetical Questions"
+  author: "Randall Munroe"
+  status: finished
+  category: science
+
+- title: "What If? 2: Additional Serious Scientific Answers to Absurd Hypothetical Questions"
+  author: "Randall Munroe"
+  status: finished
+  category: science
+
+- title: "Craft Coffee: A Manual"
+  author: "Jessica Easto"
+  status: finished
+  category: food-drink
+
+- title: "How to Make the Best Coffee at Home"
+  author: "James Hoffmann"
+  status: finished
+  category: food-drink
+
+- title: "Before the Coffee Gets Cold"
+  author: "Toshikazu Kawaguchi"
+  status: finished
+  category: fiction
+
+- title: "The Phantom Tollbooth"
+  author: "Norton Juster"
+  status: finished
+  category: fiction
+
+- title: "The Beauty of Everyday Things"
+  author: "Soetsu Yanagi"
+  status: finished
+  category: philosophy
+
+- title: "The Hitchhiker's Guide to the Galaxy"
+  author: "Douglas Adams"
+  status: finished
+  category: fiction
+
+- title: "The Restaurant at the End of the Universe"
+  author: "Douglas Adams"
+  status: finished
+  category: fiction
+
+- title: "Life, the Universe and Everything"
+  author: "Douglas Adams"
+  status: finished
+  category: fiction
+
