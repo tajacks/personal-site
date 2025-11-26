@@ -24,10 +24,10 @@
   },
   "homepage": "https://github.com/tajacks/personal-site#readme",
   "dependencies": {
-    "@11ty/eleventy": "^3.1.2",
-    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.2",
-    "@tailwindcss/cli": "^4.1.17",
-    "js-yaml": "^4.1.1",
-    "tailwindcss": "^4.1.17"
+    "@11ty/eleventy": "3.1.2",
+    "@11ty/eleventy-plugin-syntaxhighlight": "5.0.2",
+    "@tailwindcss/cli": "4.1.17",
+    "js-yaml": "4.1.1",
+    "tailwindcss": "4.1.17"
   }
 }
