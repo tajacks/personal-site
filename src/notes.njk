@@ -1,0 +1,36 @@
+---
+layout: base.njk
+title: Notes
+---
+<div class="container-narrow">
+  <h1 class="text-3xl font-bold text-text-primary mb-2">/notes</h1>
+  <p class="text-text-secondary mb-8">
+    My personal wiki. Quick references, code snippets, and things worth remembering.
+  </p>
+
+  {% if collections.notesByCategory | length > 0 %}
+  <div class="space-y-8">
+    {% for categoryGroup in collections.notesByCategory %}
+    <section>
+      <h2 class="text-xl font-semibold text-text-primary mb-4">{{ categoryGroup.category }}</h2>
+      <ul class="space-y-3">
+        {% for note in categoryGroup.notes %}
+        <li class="border-l-2 border-border pl-4 py-1 hover:border-accent-400 transition-colors">
+          <a href="{{ note.url }}" class="text-text-secondary hover:text-accent-400 transition-colors">
+            {{ note.data.title }}
+          </a>
+          {% if note.data.description %}
+          <p class="text-sm text-text-muted mt-1">{{ note.data.description }}</p>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card text-center text-text-muted">
+    <p>No notes yet.</p>
+  </div>
+  {% endif %}
+</div>
