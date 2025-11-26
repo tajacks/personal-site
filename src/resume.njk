@@ -1,0 +1,110 @@
+---
+layout: base.njk
+title: Resume
+---
+<div class="container-narrow">
+  <h1 class="text-3xl font-bold text-text-primary mb-2">/resume</h1>
+  <p class="text-text-secondary mb-8">
+    {{ resume.basics.headline }}
+  </p>
+
+  {% if resume.basics.summary %}
+  <section class="mb-8">
+    <p class="text-text-secondary">{{ resume.basics.summary }}</p>
+    <p class="text-text-muted text-sm italic mt-4">Full resume available <a href="mailto:{{ site.author.email }}" class="text-accent-400 hover:text-accent-600">upon request</a>.</p>
+  </section>
+  {% endif %}
+
+  {# Experience Section #}
+  {% if resume.experience | length > 0 %}
+  <section class="mb-10">
+    <h2 class="section-heading">Experience</h2>
+    <div class="space-y-6">
+      {% for job in resume.experience %}
+      <div class="border-l-2 border-border pl-4">
+        <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-1">
+          <h3 class="font-semibold text-text-primary">{{ job.title }}</h3>
+          <span class="text-text-muted text-sm">
+            {{ job.start | monthYear }}{% if job.end %} – {{ job.end | monthYear }}{% else %} – Present{% endif %}
+          </span>
+        </div>
+        <p class="text-text-secondary text-sm mb-2">{{ job.company }}{% if job.location %}, {{ job.location }}{% endif %}</p>
+        {% if job.overview %}
+        <p class="text-text-secondary text-sm leading-relaxed">{{ job.overview }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# Education Section #}
+  {% if resume.education | length > 0 %}
+  <section class="mb-10">
+    <h2 class="section-heading">Education</h2>
+    <div class="space-y-4">
+      {% for edu in resume.education %}
+      <div class="border-l-2 border-border pl-4">
+        <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+          <h3 class="font-semibold text-text-primary">{{ edu.degree }}</h3>
+          <span class="text-text-muted text-sm">{{ edu.year }}</span>
+        </div>
+        <p class="text-text-secondary text-sm">{{ edu.institution }}{% if edu.location %}, {{ edu.location }}{% endif %}</p>
+        {% if edu.notes %}
+        <p class="text-text-muted text-sm mt-1">{{ edu.notes }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# Skills Section #}
+  {% if resume.skills | length > 0 %}
+  <section class="mb-10">
+    <h2 class="section-heading">Skills</h2>
+    <div class="space-y-4">
+      {% for skillGroup in resume.skills %}
+      <div>
+        <h3 class="text-sm font-semibold text-text-muted mb-2">{{ skillGroup.category }}</h3>
+        <div class="flex flex-wrap gap-2">
+          {% for skill in skillGroup.items %}
+          <span class="px-2 py-1 text-sm bg-bg-secondary border border-border rounded text-text-secondary">{{ skill }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# Certifications Section #}
+  {% if resume.certifications | length > 0 %}
+  <section class="mb-10">
+    <h2 class="section-heading">Certifications</h2>
+    <div class="space-y-3">
+      {% for cert in resume.certifications %}
+      <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+        <div>
+          <span class="text-text-primary">{{ cert.name }}</span>
+          <span class="text-text-muted text-sm"> — {{ cert.issuer }}</span>
+        </div>
+        <span class="text-text-muted text-sm">{{ cert.year }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# Awards Section #}
+  {% if resume.awards | length > 0 %}
+  <section class="mb-10">
+    <h2 class="section-heading">Awards</h2>
+    <ul class="space-y-2">
+      {% for award in resume.awards %}
+      <li class="text-text-secondary">{{ award }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</div>
