@@ -41,12 +41,12 @@ experience:
     end: "2021-07"
     overview: "Automated network monitoring and configuration tasks with Python. Integrated third-party tools and developed scripts for network data analysis and visualization."
 
-education:
-  - degree: "Advanced Diploma - Network Engineering & Security Analyst"
-    institution: "Mohawk College"
-    location: "Hamilton, ON"
-    year: 2018
-    notes: "Dean's Honour List"
+#education:
+#  - degree: ""
+#    institution: ""
+#    location: ""
+#    year: 2018
+#    notes: ""
 
 skills:
   - category: "Core Technologies"
@@ -66,5 +66,5 @@ skills:
       - "Troubleshooting"
       - "Network Protocols"
 
-awards:
-  - "RBC Conference Award"
+#awards:
+#  - ""
