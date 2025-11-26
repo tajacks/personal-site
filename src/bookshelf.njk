@@ -13,6 +13,9 @@ title: Bookshelf
     <span>💻 Technical</span>
     <span>💡 Self-Help</span>
     <span>🤔 Philosophy</span>
+    <span>📚 Non-Fiction</span>
+    <span>🔬 Science</span>
+    <span>☕ Food & Drink</span>
   </div>
 
   {% set reading = books | byStatus("reading") %}
@@ -66,6 +69,30 @@ title: Bookshelf
       </div>
     </div>
     {% endfor %}
+
+    {# Books without a year #}
+    {% set unknownYear = finished | withoutYear %}
+    {% if unknownYear | length > 0 %}
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-text-muted mb-4">Date Unknown</h3>
+      <div class="space-y-4">
+        {% for book in unknownYear %}
+        <div class="border-l-2 border-border pl-4">
+          <div class="flex items-start gap-2">
+            <span class="text-lg" title="{{ book.category }}">{{ book.category | bookIcon }}</span>
+            <div class="flex-1">
+              <h4 class="font-semibold text-text-primary">{{ book.title }}</h4>
+              <p class="text-text-muted text-sm">{{ book.author }}</p>
+              {% if book.thoughts %}
+              <p class="text-text-secondary text-sm mt-1">{{ book.thoughts }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
   </section>
   {% endif %}
 
