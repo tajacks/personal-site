@@ -11,7 +11,7 @@ created: 2023-04-02
 ---
 
 The Erlang function `:public_key.cacerts_load/1` can be used to load trusted CA certificates from a file,
-and with any Erlang function, can be called from Elixir. The spec for this function shows it returns either
+and with any Erlang function, it can be called from Elixir. The spec for this function shows it returns either
 `:ok` or a tuple of `{:error, reason}`:
 
 ```
