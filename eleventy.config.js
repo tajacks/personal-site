@@ -9,6 +9,7 @@ export default function(eleventyConfig) {
   eleventyConfig.addDataExtension("yaml", contents => yaml.load(contents));
   // Pass through static assets
   eleventyConfig.addPassthroughCopy("src/assets");
+  eleventyConfig.addPassthroughCopy("src/robots.txt");
 
   // Watch for CSS changes
   eleventyConfig.addWatchTarget("src/css/");

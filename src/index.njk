@@ -7,11 +7,11 @@ layout: base.njk
     <h1 class="text-3xl font-bold text-text-primary mb-6">About</h1>
     <div class="prose mb-8">
       <p>
-        I'm a software developer with a background in networking, infrastructure, and automation. I believe
+        I am a software developer with a background in networking, infrastructure, and automation. I believe
         in building simple, maintainable systems to solve complicated problems.
       </p>
       <p>
-        I am <a href="/resume">currently working</a> as a Principle Engineer in the Canadian banking space.
+        I am <a href="/resume">currently working</a> as a {{ resume.experience[0].title }}{% if resume.experience[0].team %} on the {{ resume.experience[0].team }} team{% endif %} at {{ resume.experience[0].company }}.
       </p>
       <p>
         Outside of work, I enjoy tinkering with and maintaining my own servers, and, repairing mechanical watches.
