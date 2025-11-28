@@ -28,6 +28,9 @@ title: Resume
             {{ job.start | monthYear }}{% if job.end %} – {{ job.end | monthYear }}{% else %} – Present{% endif %}
           </span>
         </div>
+        {% if job.team %}
+        <p class="text-text-primary text-sm mb-1">{{ job.team }}</p>
+        {% endif %}
         <p class="text-text-secondary text-sm mb-2">{{ job.company }}{% if job.location %}, {{ job.location }}{% endif %}</p>
         {% if job.overview %}
         <p class="text-text-secondary text-sm leading-relaxed">{{ job.overview }}</p>
