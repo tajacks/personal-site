@@ -15,5 +15,5 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Deployment script with credentials
+# Deployment script
 deploy.sh
