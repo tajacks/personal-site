@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Safely mock static DateTime functions">
+  <title>Mocking Static DateTime Functions | Thomas Jack</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="border-b border-border">
+  <nav class="container-narrow py-4">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <a href="/" class="text-text-primary font-semibold hover:text-accent-400 transition-colors">
+        Thomas Jack
+      </a>
+      <ul class="flex flex-wrap items-center gap-3 sm:gap-6 text-sm">
+        
+        <li>
+          <a href="/" class="nav-link">
+            Home
+          </a>
+        </li>
+        
+        <li>
+          <a href="/bookshelf/" class="nav-link">
+            Bookshelf
+          </a>
+        </li>
+        
+        <li>
+          <a href="/notes/" class="nav-link">
+            Notes
+          </a>
+        </li>
+        
+        <li>
+          <a href="/resume/" class="nav-link">
+            Resume
+          </a>
+        </li>
+        
+      </ul>
+    </div>
+  </nav>
+</header>
+
+
+  <main class="flex-1 py-12">
+    <div class="container-narrow">
+  <nav class="text-sm text-text-muted mb-6">
+    <a href="/notes/" class="hover:text-text-secondary transition-colors">&larr; Back to notes</a>
+  </nav>
+
+  <article>
+  <header class="mb-8">
+    <h1 class="text-3xl font-bold text-text-primary mb-3">Mocking Static DateTime Functions</h1>
+
+    
+    <div class="flex flex-wrap gap-2 mb-4">
+      
+      <span class="px-2 py-1 text-xs bg-bg-secondary border border-border rounded text-text-muted">
+        #networking
+      </span>
+      
+      <span class="px-2 py-1 text-xs bg-bg-secondary border border-border rounded text-text-muted">
+        #bitshift
+      </span>
+      
+      <span class="px-2 py-1 text-xs bg-bg-secondary border border-border rounded text-text-muted">
+        #java
+      </span>
+      
+    </div>
+    
+
+    <div class="text-sm text-text-muted space-y-1">
+      
+      <p>Created: <time datetime="2023-04-11">April 10, 2023</time></p>
+      
+      
+    </div>
+  </header>
+
+  <div class="prose">
+    <p>Static mocks may be an indicator of a larger problem, but, are sometimes unavoidable. Commonly used static methods
+are ones for receiving the current date and time, typically called <code>.now()</code>, such as <code>LocalDateTime.now()</code> or
+<code>Instant.now()</code>.</p>
+<p>When testing routines which call static methods on <code>DateTime</code> objects such as <code>LocalDateTime.now()</code>, it may be desirable
+to return the same value consistently in tests (such as a fixed point in time). Do not mock the <code>.now()</code> functions
+directly if <code>add</code> or <code>subtract</code> operations are necessary. Mocking static methods on these object types typically
+interferes with internal static factories which construct new objects. This can cause undesirable behaviour in testing.</p>
+<p>To consistently return the same date and time in tests, mock the <code>Clock</code> which powers these other date and time types:</p>
+<pre class="language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">DateTimeTest</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">void</span> <span class="token function">canMockDate_andPerformOperationsAgainst</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">final</span> <span class="token class-name">Clock</span> fixedClock <span class="token operator">=</span> <span class="token class-name">Clock</span><span class="token punctuation">.</span><span class="token function">fixed</span><span class="token punctuation">(</span><span class="token class-name">Instant</span><span class="token punctuation">.</span><span class="token constant">EPOCH</span><span class="token punctuation">,</span> <span class="token class-name">ZoneId</span><span class="token punctuation">.</span><span class="token function">of</span><span class="token punctuation">(</span><span class="token string">"America/New_York"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">(</span><span class="token class-name">MockedStatic</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Clock</span><span class="token punctuation">></span></span> mockClock <span class="token operator">=</span> <span class="token class-name">Mockito</span><span class="token punctuation">.</span><span class="token function">mockStatic</span><span class="token punctuation">(</span><span class="token class-name">Clock</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            mockClock<span class="token punctuation">.</span><span class="token function">when</span><span class="token punctuation">(</span><span class="token class-name">Clock</span><span class="token operator">::</span><span class="token function">systemDefaultZone</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">thenReturn</span><span class="token punctuation">(</span>fixedClock<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">assertEquals</span><span class="token punctuation">(</span><span class="token class-name">LocalDateTime</span><span class="token punctuation">.</span><span class="token function">ofInstant</span><span class="token punctuation">(</span><span class="token class-name">Instant</span><span class="token punctuation">.</span><span class="token constant">EPOCH</span><span class="token punctuation">,</span> <span class="token class-name">ZoneId</span><span class="token punctuation">.</span><span class="token function">of</span><span class="token punctuation">(</span><span class="token string">"America/New_York"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token class-name">LocalDateTime</span><span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment">// Can add and subtract</span>
+            <span class="token function">assertEquals</span><span class="token punctuation">(</span><span class="token class-name">LocalDateTime</span><span class="token punctuation">.</span><span class="token function">ofInstant</span><span class="token punctuation">(</span><span class="token class-name">Instant</span><span class="token punctuation">.</span><span class="token constant">EPOCH</span><span class="token punctuation">,</span> <span class="token class-name">ZoneId</span><span class="token punctuation">.</span><span class="token function">of</span><span class="token punctuation">(</span><span class="token string">"America/New_York"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">plusDays</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token class-name">LocalDateTime</span><span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">plusDays</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Ideally, the function being tested should receive either a provider for a <code>DateTime</code> object, or, a <code>DateTime</code> object
+directly, instead of relying on static mocks. Unfortunately this may be unavoidable - especially when working with
+legacy code.</p>
+
+  </div>
+
+  
+</article>
+</div>
+
+
+  </main>
+
+  <footer class="border-t border-border py-8 mt-auto">
+  <div class="container-narrow">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-text-muted">
+      <p>&copy; 2025 Thomas Jack</p>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/tajacks" class="hover:text-text-secondary transition-colors" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+        <a href="mailto:tom@tomjack.ca" class="hover:text-text-secondary transition-colors">
+          Email
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
