@@ -43,7 +43,7 @@
 /* Component styles */
 @layer components {
   .container-narrow {
-    @apply max-w-2xl mx-auto px-6;
+    @apply max-w-3xl mx-auto px-6;
   }
 
   .nav-link {

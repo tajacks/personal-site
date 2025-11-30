@@ -2,7 +2,7 @@
 layout: note.njk
 title: "Mocking Static DateTime Functions"
 category: Java
-description: "Using MockedStatic to mock datettime functions"
+description: "Safely mock static DateTime functions"
 tags:
   - networking
   - bitshift
@@ -14,7 +14,7 @@ Static mocks may be an indicator of a larger problem, but, are sometimes unavoid
 are ones for receiving the current date and time, typically called `.now()`, such as `LocalDateTime.now()` or
 `Instant.now()`.
 
-When testing methods which call static methods on `DateTime` objects such as `LocalDateTime.now()`, it may be desirable
+When testing routines which call static methods on `DateTime` objects such as `LocalDateTime.now()`, it may be desirable
 to return the same value consistently in tests (such as a fixed point in time). Do not mock the `.now()` functions
 directly if `add` or `subtract` operations are necessary. Mocking static methods on these object types typically
 interferes with internal static factories which construct new objects. This can cause undesirable behaviour in testing.
