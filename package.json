@@ -5,6 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -rf _site",
+    "prebuild": "npm run clean",
     "build:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./_site/css/style.css --minify",
     "watch:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./_site/css/style.css --watch",
     "build:11ty": "npx @11ty/eleventy",
