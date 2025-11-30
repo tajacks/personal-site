@@ -2,7 +2,11 @@
 layout: note.njk
 title: "Mocking Static DateTime Functions"
 category: Java
+<<<<<<< HEAD
 description: "Safely mock static DateTime functions"
+=======
+description: "Using MockedStatic to mock datettime functions"
+>>>>>>> origin/main
 tags:
   - networking
   - bitshift
