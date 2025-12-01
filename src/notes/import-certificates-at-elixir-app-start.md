@@ -2,7 +2,7 @@
 layout: note.njk
 title: "Elixir Certificate Import"
 category: Elixir
-description: "Importing trusted certificates during application start."
+description: "Importing trusted certificates during application start"
 tags:
   - elixir
   - erlang
