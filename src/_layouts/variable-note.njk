@@ -1,0 +1,110 @@
+---
+layout: base.njk
+---
+<div class="container-narrow">
+  <nav class="text-sm text-text-muted mb-6">
+    <a href="/notes/" class="hover:text-text-secondary transition-colors">&larr; Back to notes</a>
+  </nav>
+
+  <article>
+  <header class="mb-8">
+    <div class="flex items-start justify-between gap-4 mb-3">
+      <h1 class="text-3xl font-bold text-text-primary">{{ title }}</h1>
+      {% if variables %}
+      <button id="customize-vars-btn" class="btn-customize flex-shrink-0">
+        Customize Variables
+      </button>
+      {% endif %}
+    </div>
+
+    {% if tags %}
+    <div class="flex flex-wrap gap-2 mb-4">
+      {% for tag in tags %}
+      <span class="px-2 py-1 text-xs bg-bg-secondary border border-border rounded text-text-muted">
+        #{{ tag }}
+      </span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="text-sm text-text-muted space-y-1">
+      {% if created %}
+      <p>Created: <time datetime="{{ created | isoDate }}">{{ created | dateFormat }}</time></p>
+      {% endif %}
+      {% if updated %}
+      <p>Updated: <time datetime="{{ updated | isoDate }}">{{ updated | dateFormat }}</time></p>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="prose" id="prose-content">
+    {{ content | safe }}
+  </div>
+
+  {% if related %}
+  <footer class="mt-12 pt-8 border-t border-border">
+    <h2 class="text-sm font-semibold text-text-muted mb-3">Related Notes</h2>
+    <ul class="space-y-2">
+      {% for noteUrl in related %}
+      {% set relatedNote = collections.notes | find(noteUrl) %}
+      {% if relatedNote %}
+      <li>
+        <a href="{{ relatedNote.url }}" class="text-accent-400 hover:text-accent-600 transition-colors">
+          {{ relatedNote.data.title }}
+        </a>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+  </footer>
+  {% endif %}
+</article>
+</div>
+
+{% if variables %}
+<!-- Variable customization modal -->
+<div id="var-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="text-lg font-semibold text-text-primary">Customize Variables</h2>
+      <button id="modal-close" class="text-text-muted hover:text-text-primary transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <form id="var-form" class="modal-body">
+      {% for variable in variables %}
+      <div class="mb-4">
+        <label for="var-{{ variable.name }}" class="block text-sm font-medium text-text-secondary mb-1">
+          ${{ variable.name }}
+        </label>
+        {% if variable.description %}
+        <p class="text-xs text-text-muted mb-2">{{ variable.description }}</p>
+        {% endif %}
+        <input
+          type="text"
+          id="var-{{ variable.name }}"
+          name="{{ variable.name }}"
+          class="var-input"
+          placeholder="${{ variable.name }}"
+        >
+      </div>
+      {% endfor %}
+    </form>
+    <div class="modal-footer">
+      <button type="button" id="modal-reset" class="btn btn-outline">Reset</button>
+      <div class="flex gap-2">
+        <button type="button" id="modal-cancel" class="btn btn-outline">Cancel</button>
+        <button type="button" id="modal-save" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pass variables config to JavaScript -->
+<script id="variables-config" type="application/json">
+{{ variables | dump | safe }}
+</script>
+<script src="/assets/js/variable-note.js"></script>
+{% endif %}
