@@ -86,12 +86,12 @@
   </header>
 
   <div class="prose" id="prose-content">
-    <h2>Introduction</h2>
+    <h2 id="introduction" tabindex="-1"><a class="header-anchor" href="#introduction"><span>Introduction</span></a></h2>
 <p>This guide is a document for myself to capture what I know about running and managing
 servers. It is used to document my personal architecture, setup, hardening, and ongoing maintenance procedures for hobby
 servers.</p>
 <p>It is not versioned and the current state reflects how I do things today. It is subject to change.</p>
-<h3>Automation Tools</h3>
+<h3 id="automation-tools" tabindex="-1"><a class="header-anchor" href="#automation-tools"><span>Automation Tools</span></a></h3>
 <p>The steps in this note are intended to be manually executed. I've experimented with a variety of automation tools to
 provision new servers (ansible, bash scripts, cloud-init, etc), and while they certainly are <em>neat</em>, they don't bring me
 enough value. Setting up a new server manually takes ~30 minutes if you're decent on the command line (a skill
@@ -108,7 +108,7 @@ every few years.</p>
 <p>This philosophy works where ultimately the stakes and volume of work are low. If I had to run a business to support my
 livelihood, or provision tens to hundreds of servers, I would undoubtedly reach for an alternative.</p>
 <p>For personal-use servers, it's great.</p>
-<h3>Variable Usage</h3>
+<h3 id="variable-usage" tabindex="-1"><a class="header-anchor" href="#variable-usage"><span>Variable Usage</span></a></h3>
 <p>Setting shell variables can be skipped if you have configured custom values for all variables by using the
 button at the top of this guide.</p>
 <p>If setting variables in the shell, set the following to non-empty values.</p>
@@ -118,10 +118,10 @@ button at the top of this guide.</p>
 <span class="token assign-left variable">APP_USER</span><span class="token operator">=</span><span class="token string">""</span>             <span class="token comment"># I use 'app'</span>
 <span class="token assign-left variable">SSH_PORT</span><span class="token operator">=</span><span class="token string">""</span>             <span class="token comment"># I use 2222</span></code></pre>
 <hr>
-<h2>Initial Setup</h2>
+<h2 id="initial-setup" tabindex="-1"><a class="header-anchor" href="#initial-setup"><span>Initial Setup</span></a></h2>
 <p>This section is intended to bring your server from the initial configuration to a hardened base with core configurations that are ready to be built upon.</p>
 <p>The commands in this section should be executed as the <code>root</code> user.</p>
-<h3>System Updates</h3>
+<h3 id="system-updates" tabindex="-1"><a class="header-anchor" href="#system-updates"><span>System Updates</span></a></h3>
 <p>Update the <code>apt</code> cache.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> update</code></pre>
 <p>Upgrade the system, using this upgrade command to remove packages if it is necessary.</p>
@@ -130,7 +130,7 @@ button at the top of this guide.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> autoclean</code></pre>
 <p>Remove any packages which were installed as a dependency of another package which are no longer needed.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> autoremove</code></pre>
-<h3>Install Essential Packages</h3>
+<h3 id="install-essential-packages" tabindex="-1"><a class="header-anchor" href="#install-essential-packages"><span>Install Essential Packages</span></a></h3>
 <p>Install some core and generally useful software packages onto the server.</p>
 <table>
 <thead>
@@ -218,7 +218,7 @@ tree <span class="token punctuation">\</span>
 ufw <span class="token punctuation">\</span>
 unattended-upgrades <span class="token punctuation">\</span>
 <span class="token function">vim</span></code></pre>
-<h3>Create Admin User</h3>
+<h3 id="create-admin-user" tabindex="-1"><a class="header-anchor" href="#create-admin-user"><span>Create Admin User</span></a></h3>
 <p>The admin user will have privileged access to the server but does not run applications. This user will be configured to run <code>sudo</code> commands without a password prompt.</p>
 <p>Create the user with a home directory.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">useradd</span> <span class="token parameter variable">-m</span> <span class="token parameter variable">-s</span> /usr/bin/bash <span class="token parameter variable">-c</span> <span class="token string">"<span class="token variable">$ADMIN_USER_COMMENT</span>"</span> <span class="token string">"<span class="token variable">$ADMIN_USER</span>"</span></code></pre>
@@ -235,11 +235,11 @@ unattended-upgrades <span class="token punctuation">\</span>
 <pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">"<span class="token variable">$ADMIN_SSH_KEY</span>"</span> <span class="token operator">></span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh/authorized_keys"</span>
 <span class="token function">chmod</span> <span class="token number">600</span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh/authorized_keys"</span>
 <span class="token function">chown</span> <span class="token string">"<span class="token variable">$ADMIN_USER</span>:<span class="token variable">$ADMIN_USER</span>"</span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh/authorized_keys"</span></code></pre>
-<h3>Create Application User</h3>
+<h3 id="create-application-user" tabindex="-1"><a class="header-anchor" href="#create-application-user"><span>Create Application User</span></a></h3>
 <p>The application user will be a non-privileged user that runs containerized applications. This user has no <code>sudo</code> access and is isolated from administrative functions.</p>
 <p>Create the user with a home directory.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">useradd</span> <span class="token parameter variable">-m</span> <span class="token parameter variable">-s</span> /usr/bin/bash <span class="token parameter variable">-c</span> <span class="token string">"Application User"</span> <span class="token string">"<span class="token variable">$APP_USER</span>"</span></code></pre>
-<h3>SSH Hardening</h3>
+<h3 id="ssh-hardening" tabindex="-1"><a class="header-anchor" href="#ssh-hardening"><span>SSH Hardening</span></a></h3>
 <p>Hardening SSH access includes changing the default port, allowing only specific users to connect via SSH, and more. These changes can prevent the bulk of bots and scanners
 which constantly attempt to find servers with open or weakly configured SSH access across the internet.</p>
 <p>Take a backup of the configuration which shipped with the server before modifying it.</p>
@@ -290,7 +290,7 @@ Subsystem sftp /usr/lib/openssh/sftp-server'</span> <span class="token operator"
 <pre class="language-bash"><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> <span class="token function">ssh</span>
 systemctl reload <span class="token function">ssh</span></code></pre>
 <p>If the connection succeeds, you can safely continue. If it fails, you still have your current session connected to fix any configuration issues.</p>
-<h3>Setup fail2ban</h3>
+<h3 id="setup-fail2ban" tabindex="-1"><a class="header-anchor" href="#setup-fail2ban"><span>Setup fail2ban</span></a></h3>
 <p>fail2ban is a utility which monitors for unsuccessful SSH attempts in your authentication logs and temporarily bans IP
 addresses which exceed a threshold. Write the configuration file.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'[DEFAULT]
@@ -314,7 +314,7 @@ maxretry = 5'</span> <span class="token operator">></span> /etc/fail2ban/jail.lo
 systemctl restart fail2ban</code></pre>
 <p>Check if fail2ban is running.</p>
 <pre class="language-bash"><code class="language-bash">systemctl status fail2ban</code></pre>
-<h3>Configure Firewall</h3>
+<h3 id="configure-firewall" tabindex="-1"><a class="header-anchor" href="#configure-firewall"><span>Configure Firewall</span></a></h3>
 <p><code>ufw</code> is the utility used for controlling the host firewall. A good starting place is to allow all outbound traffic,
 deny all inbound traffic, and then selectively allow SSH + web traffic to your server. If your server will not serve
 web content, those rules can be omitted.</p>
@@ -329,14 +329,14 @@ ufw allow <span class="token number">443</span>/tcp comment <span class="token s
 <pre class="language-bash"><code class="language-bash">ufw <span class="token parameter variable">--force</span> <span class="token builtin class-name">enable</span></code></pre>
 <p>Validate the rules.</p>
 <pre class="language-bash"><code class="language-bash">ufw status verbose</code></pre>
-<h3>Secure File Permissions</h3>
+<h3 id="secure-file-permissions" tabindex="-1"><a class="header-anchor" href="#secure-file-permissions"><span>Secure File Permissions</span></a></h3>
 <p>Set secure file permissions. The files may already have their permissions set appropriately, but nonetheless, it is good defensive practice to set them explicitly.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">chmod</span> <span class="token number">644</span> /etc/passwd
 <span class="token function">chmod</span> <span class="token number">640</span> /etc/shadow
 <span class="token function">chmod</span> <span class="token number">644</span> /etc/group
 <span class="token function">chmod</span> <span class="token number">640</span> /etc/gshadow
 <span class="token function">chmod</span> <span class="token number">600</span> /etc/ssh/sshd_config</code></pre>
-<h3>Configure Automatic Updates</h3>
+<h3 id="configure-automatic-updates" tabindex="-1"><a class="header-anchor" href="#configure-automatic-updates"><span>Configure Automatic Updates</span></a></h3>
 <p>The <code>unattended-upgrades</code> package automatically installs security updates to keep the system patched without manual intervention. This configuration enables automatic security updates while preventing automatic reboots, giving you control over when the server restarts.</p>
 <p>Write the unattended-upgrades configuration.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'Unattended-Upgrade::Allowed-Origins {
@@ -365,7 +365,7 @@ systemctl start unattended-upgrades</code></pre>
 <p>You should see <code>active (running)</code> in the output. Verify the automatic upgrade configuration is recognised.</p>
 <pre class="language-bash"><code class="language-bash">apt-config dump APT::Periodic::Unattended-Upgrade</code></pre>
 <p>This should return <code>APT::Periodic::Unattended-Upgrade &quot;1&quot;;</code> confirming automatic upgrades are enabled.</p>
-<h3>Enable System Statistics</h3>
+<h3 id="enable-system-statistics" tabindex="-1"><a class="header-anchor" href="#enable-system-statistics"><span>Enable System Statistics</span></a></h3>
 <p>The <code>sysstat</code> package collects system performance and activity data, providing valuable metrics for monitoring CPU, memory, disk I/O, and network usage over time. Enable the service.</p>
 <pre class="language-bash"><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> sysstat
 systemctl start sysstat</code></pre>
@@ -374,7 +374,7 @@ systemctl start sysstat</code></pre>
 <p>Verify the configuration change.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">grep</span> HISTORY /etc/sysstat/sysstat</code></pre>
 <p>This should return <code>HISTORY=28</code>.</p>
-<h3>Install Podman</h3>
+<h3 id="install-podman" tabindex="-1"><a class="header-anchor" href="#install-podman"><span>Install Podman</span></a></h3>
 <p>Podman is a container engine and an alternative to Docker. Install the required packages.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> <span class="token function">install</span> <span class="token function">podman</span> passt uidmap dbus-user-session systemd-container</code></pre>
 <p>Configure subordinate user and group ID ranges for the application user to enable rootless container operation.</p>
@@ -412,7 +412,7 @@ graphroot = <span class="token entity" title="\&quot;">\"</span>\<span class="to
 <pre class="language-bash"><code class="language-bash"><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> hello-world</code></pre>
 <p>If successful, you should see a welcome message from the container. Exit the application user's shell.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">exit</span></code></pre>
-<h3>Post Installation Tasks</h3>
+<h3 id="post-installation-tasks" tabindex="-1"><a class="header-anchor" href="#post-installation-tasks"><span>Post Installation Tasks</span></a></h3>
 <p>With the server configuration complete, a reboot ensures all changes take effect cleanly. After rebooting, reconnect using the newly configured admin user and SSH port. With the admin user established, it's time to audit and clean up any provisioning users (like <code>debian</code>) that may have been created by the cloud provider, and ensure the <code>root</code> account doesn't contain any SSH keys that would allow direct access.</p>
 <p>Reboot the server.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">reboot</span></code></pre>

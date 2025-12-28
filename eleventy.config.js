@@ -1,10 +1,21 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
 import syntaxHighlight from '@11ty/eleventy-plugin-syntaxhighlight';
+import markdownIt from 'markdown-it';
+import markdownItAnchor from 'markdown-it-anchor';
+import slugify from 'slugify';
 
 export default function(eleventyConfig) {
   // Add syntax highlighting plugin
   eleventyConfig.addPlugin(syntaxHighlight);
+
+  // Configure markdown with anchor links on headings
+  const md = markdownIt({ html: true });
+  md.use(markdownItAnchor, {
+    slugify: s => slugify(s, { lower: true, strict: true }),
+    permalink: markdownItAnchor.permalink.headerLink({ safariReaderFix: true })
+  });
+  eleventyConfig.setLibrary("md", md);
   // Add YAML support for data files
   eleventyConfig.addDataExtension("yaml", contents => yaml.load(contents));
   // Pass through static assets

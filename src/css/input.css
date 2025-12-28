@@ -103,6 +103,16 @@
     @apply text-lg font-semibold text-text-primary mt-6 mb-3;
   }
 
+  .prose h2 a,
+  .prose h3 a {
+    @apply text-inherit no-underline;
+  }
+
+  .prose h2 a:hover,
+  .prose h3 a:hover {
+    @apply underline;
+  }
+
   .prose ul {
     @apply mb-6 space-y-2 list-disc list-inside;
   }
