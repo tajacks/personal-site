@@ -132,6 +132,23 @@
     @apply border-l-4 border-border pl-4 italic text-text-muted my-6;
   }
 
+  /* Tables */
+  .prose table {
+    @apply w-full my-6 border-collapse;
+  }
+
+  .prose th {
+    @apply text-left text-text-primary font-semibold px-4 py-2 border-b border-border;
+  }
+
+  .prose td {
+    @apply text-text-secondary px-4 py-2 border-b border-border;
+  }
+
+  .prose tr:last-child td {
+    @apply border-b-0;
+  }
+
   /* Code blocks */
   .prose pre {
     @apply bg-bg-tertiary rounded-lg p-4 overflow-x-auto my-6;
