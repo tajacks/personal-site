@@ -459,13 +459,6 @@ chmod 755 "/home/$APP_USER/.config/containers"
 
 Write the storage configuration file.
 
-```
-[storage]
-driver = "overlay"
-runroot = "/run/user/$APP_USER_UID/containers"
-graphroot = "$HOME/.local/share/containers/storage"
-```
-
 ```bash
 APP_USER_UID=$(id -u "$APP_USER")
 echo "[storage]

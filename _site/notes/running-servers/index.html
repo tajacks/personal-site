@@ -392,11 +392,6 @@ net.ipv4.ip_unprivileged_port_start=80"</span> <span class="token operator">></s
 <span class="token function">mkdir</span> <span class="token parameter variable">-p</span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.local/share/containers/storage"</span>
 <span class="token function">chmod</span> <span class="token number">755</span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.config/containers"</span></code></pre>
 <p>Write the storage configuration file.</p>
-<pre><code>[storage]
-driver = &quot;overlay&quot;
-runroot = &quot;/run/user/$APP_USER_UID/containers&quot;
-graphroot = &quot;$HOME/.local/share/containers/storage&quot;
-</code></pre>
 <pre class="language-bash"><code class="language-bash"><span class="token assign-left variable">APP_USER_UID</span><span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span><span class="token function">id</span> <span class="token parameter variable">-u</span> <span class="token string">"<span class="token variable">$APP_USER</span>"</span><span class="token variable">)</span></span>
 <span class="token builtin class-name">echo</span> <span class="token string">"[storage]
 driver = <span class="token entity" title="\&quot;">\"</span>overlay<span class="token entity" title="\&quot;">\"</span>
