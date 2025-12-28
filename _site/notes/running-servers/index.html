@@ -82,6 +82,380 @@
     <h2>Introduction</h2>
 <hr>
 <h2>Initial Setup</h2>
+<p>Update the <code>apt</code> cache.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> update</code></pre>
+<p>Upgrade the system, using this upgrade command to remove packages if it is necessary.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> full-upgrade</code></pre>
+<p>Clean the local repository of files that can no longer be downloaded.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> autoclean</code></pre>
+<p>Remove any packages which were installed as a dependency of another package which are no longer needed.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> autoremove</code></pre>
+<h3>Install Essential Packages</h3>
+<p>Install some core and generally useful software packages onto the server.</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ca-certificates</td>
+<td>Common CA certificates</td>
+</tr>
+<tr>
+<td>curl</td>
+<td>Data transfer tool</td>
+</tr>
+<tr>
+<td>fail2ban</td>
+<td>Brute-force attack protection</td>
+</tr>
+<tr>
+<td>git</td>
+<td>Version control system</td>
+</tr>
+<tr>
+<td>gnupg</td>
+<td>Encryption and signing toolkit</td>
+</tr>
+<tr>
+<td>htop</td>
+<td>Interactive process viewer</td>
+</tr>
+<tr>
+<td>lsb-release</td>
+<td>Linux distribution identifier</td>
+</tr>
+<tr>
+<td>net-tools</td>
+<td>Network utilities</td>
+</tr>
+<tr>
+<td>rsync</td>
+<td>File synchronization tool</td>
+</tr>
+<tr>
+<td>rsyslog</td>
+<td>System logging daemon</td>
+</tr>
+<tr>
+<td>sysstat</td>
+<td>System performance tools</td>
+</tr>
+<tr>
+<td>tree</td>
+<td>Directory listing tool</td>
+</tr>
+<tr>
+<td>ufw</td>
+<td>Host-based firewall</td>
+</tr>
+<tr>
+<td>unattended-upgrades</td>
+<td>Automatic security updates</td>
+</tr>
+<tr>
+<td>vim</td>
+<td>Text editor</td>
+</tr>
+</tbody>
+</table>
+<pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> <span class="token function">install</span> <span class="token punctuation">\</span>
+ca-certificates <span class="token punctuation">\</span>
+<span class="token function">curl</span> <span class="token punctuation">\</span>
+fail2ban <span class="token punctuation">\</span>
+<span class="token function">git</span> <span class="token punctuation">\</span>
+gnupg <span class="token punctuation">\</span>
+<span class="token function">htop</span> <span class="token punctuation">\</span>
+lsb-release <span class="token punctuation">\</span>
+net-tools <span class="token punctuation">\</span>
+<span class="token function">rsync</span> <span class="token punctuation">\</span>
+rsyslog <span class="token punctuation">\</span>
+sysstat <span class="token punctuation">\</span>
+tree <span class="token punctuation">\</span>
+ufw <span class="token punctuation">\</span>
+unattended-upgrades <span class="token punctuation">\</span>
+<span class="token function">vim</span></code></pre>
+<h3>Create Admin User</h3>
+<p>The admin user will have privileged access to the server but does not run applications. This user will be configured to run <code>sudo</code> commands without a password prompt.</p>
+<p>Create the user with a home directory.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">useradd</span> <span class="token parameter variable">-m</span> <span class="token parameter variable">-s</span> /usr/bin/bash <span class="token parameter variable">-c</span> <span class="token string">"<span class="token variable">$ADMIN_USER_COMMENT</span>"</span> <span class="token string">"<span class="token variable">$ADMIN_USER</span>"</span></code></pre>
+<p>Add the user to the <code>sudo</code> group.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">usermod</span> <span class="token parameter variable">-aG</span> <span class="token function">sudo</span> <span class="token string">"<span class="token variable">$ADMIN_USER</span>"</span></code></pre>
+<p>Configure passwordless <code>sudo</code> for the admin user.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">"<span class="token variable">$ADMIN_USER</span> ALL=(ALL) NOPASSWD:ALL"</span> <span class="token operator">></span> <span class="token string">"/etc/sudoers.d/<span class="token variable">$ADMIN_USER</span>"</span>
+<span class="token function">chmod</span> 0440 <span class="token string">"/etc/sudoers.d/<span class="token variable">$ADMIN_USER</span>"</span></code></pre>
+<p>Create the admin user's SSH directory with proper ownership and file modes.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">mkdir</span> <span class="token parameter variable">-p</span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh"</span>
+<span class="token function">chmod</span> <span class="token number">700</span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh"</span>
+<span class="token function">chown</span> <span class="token string">"<span class="token variable">$ADMIN_USER</span>:<span class="token variable">$ADMIN_USER</span>"</span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh"</span></code></pre>
+<p>Add the admin user's key to the authorized keys file.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">"<span class="token variable">$ADMIN_SSH_KEY</span>"</span> <span class="token operator">></span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh/authorized_keys"</span>
+<span class="token function">chmod</span> <span class="token number">600</span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh/authorized_keys"</span>
+<span class="token function">chown</span> <span class="token string">"<span class="token variable">$ADMIN_USER</span>:<span class="token variable">$ADMIN_USER</span>"</span> <span class="token string">"/home/<span class="token variable">$ADMIN_USER</span>/.ssh/authorized_keys"</span></code></pre>
+<h3>Create Application User</h3>
+<p>The application user will be a non-privileged user that runs containerized applications. This user has no <code>sudo</code> access and is isolated from administrative functions.</p>
+<p>Create the user with a home directory.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">useradd</span> <span class="token parameter variable">-m</span> <span class="token parameter variable">-s</span> /usr/bin/bash <span class="token parameter variable">-c</span> <span class="token string">"Application User"</span> <span class="token string">"<span class="token variable">$APP_USER</span>"</span></code></pre>
+<h3>SSH Hardening</h3>
+<p>Hardening SSH access includes changing the default port, allowing only specific users to connect via SSH, and more. These changes can prevent the bulk of bots and scanners
+which constantly attempt to find servers with open or weakly configured SSH access across the internet.</p>
+<p>Take a backup of the configuration which shipped with the server before modifying it.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">cp</span> /etc/ssh/sshd_config /etc/ssh/sshd_config.bak</code></pre>
+<p>Install the configuration, overwriting the current file.</p>
+<pre><code># Hardened SSH Configuration
+# Network
+Port $SSH_PORT
+AddressFamily any
+ListenAddress 0.0.0.0
+ListenAddress ::
+# Host Keys
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_rsa_key
+# Ciphers and keying
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+# Authentication
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+UsePAM yes
+# Security settings
+MaxAuthTries 3
+MaxSessions 10
+LoginGraceTime 60
+ClientAliveInterval 300
+ClientAliveCountMax 2
+MaxStartups 10:30:60
+# Access control
+AllowUsers $ADMIN_USER
+# Logging
+SyslogFacility AUTH
+LogLevel VERBOSE
+# Disable unnecessary features
+X11Forwarding no
+PrintMotd no
+PrintLastLog yes
+TCPKeepAlive yes
+AcceptEnv LANG LC_*
+# Subsystem
+Subsystem sftp /usr/lib/openssh/sftp-server
+</code></pre>
+<pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'# Hardened SSH Configuration
+# Network
+Port $SSH_PORT
+AddressFamily any
+ListenAddress 0.0.0.0
+ListenAddress ::
+# Host Keys
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_rsa_key
+# Ciphers and keying
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+# Authentication
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+UsePAM yes
+# Security settings
+MaxAuthTries 3
+MaxSessions 10
+LoginGraceTime 60
+ClientAliveInterval 300
+ClientAliveCountMax 2
+MaxStartups 10:30:60
+# Access control
+AllowUsers $ADMIN_USER
+# Logging
+SyslogFacility AUTH
+LogLevel VERBOSE
+# Disable unnecessary features
+X11Forwarding no
+PrintMotd no
+PrintLastLog yes
+TCPKeepAlive yes
+AcceptEnv LANG LC_*
+# Subsystem
+Subsystem sftp /usr/lib/openssh/sftp-server'</span> <span class="token operator">></span> /etc/ssh/sshd_config</code></pre>
+<p>Ensure the SSH service is enabled and reload the configuration.</p>
+<pre class="language-bash"><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> <span class="token function">ssh</span>
+systemctl reload <span class="token function">ssh</span></code></pre>
+<p>If the connection succeeds, you can safely continue. If it fails, you still have your current session connected to fix any configuration issues.</p>
+<h3>Setup fail2ban</h3>
+<p>fail2ban is a utility which monitors for unsuccessful SSH attempts in your authentication logs and temporarily bans IP
+addresses which exceed a threshold. Write the configuration file.</p>
+<pre><code>[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 5
+destemail = root@localhost
+sendername = Fail2Ban
+action = %(action_)s
+[sshd]
+enabled = true
+port = $SSH_PORT
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 5
+</code></pre>
+<pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 5
+destemail = root@localhost
+sendername = Fail2Ban
+action = %(action_)s
+[sshd]
+enabled = true
+port = $SSH_PORT
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 5'</span> <span class="token operator">></span> /etc/fail2ban/jail.local</code></pre>
+<p>Set file permissions and ownership.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">chmod</span> <span class="token number">644</span> /etc/fail2ban/jail.local
+<span class="token function">chown</span> root:root /etc/fail2ban/jail.local</code></pre>
+<p>Enable and start fail2ban.</p>
+<pre class="language-bash"><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> fail2ban
+systemctl restart fail2ban</code></pre>
+<p>Check if fail2ban is running.</p>
+<pre class="language-bash"><code class="language-bash">systemctl status fail2ban</code></pre>
+<h3>Configure Firewall</h3>
+<p><code>ufw</code> is the utility used for controlling the host firewall. A good starting place is to allow all outbound traffic,
+deny all inbound traffic, and then selectively allow SSH + web traffic to your server. If your server will not serve
+web content, those rules can be omitted.</p>
+<p>Set the default policies to deny incoming and allow outgoing traffic.</p>
+<pre class="language-bash"><code class="language-bash">ufw default deny incoming
+ufw default allow outgoing</code></pre>
+<p>Allow SSH and web traffic.</p>
+<pre class="language-bash"><code class="language-bash">ufw allow <span class="token string">"<span class="token variable">$SSH_PORT</span>/tcp"</span> comment <span class="token string">'SSH'</span>
+ufw allow <span class="token number">80</span>/tcp comment <span class="token string">'HTTP'</span>
+ufw allow <span class="token number">443</span>/tcp comment <span class="token string">'HTTPS'</span></code></pre>
+<p>Enable the firewall.</p>
+<pre class="language-bash"><code class="language-bash">ufw <span class="token parameter variable">--force</span> <span class="token builtin class-name">enable</span></code></pre>
+<p>Validate the rules.</p>
+<pre class="language-bash"><code class="language-bash">ufw status verbose</code></pre>
+<h3>Secure File Permissions</h3>
+<p>Set secure file permissions. The files may already have their permissions set appropriately, but nonetheless, it is good defensive practice to set them explicitly.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">chmod</span> <span class="token number">644</span> /etc/passwd
+<span class="token function">chmod</span> <span class="token number">640</span> /etc/shadow
+<span class="token function">chmod</span> <span class="token number">644</span> /etc/group
+<span class="token function">chmod</span> <span class="token number">640</span> /etc/gshadow
+<span class="token function">chmod</span> <span class="token number">600</span> /etc/ssh/sshd_config</code></pre>
+<h3>Configure Automatic Updates</h3>
+<p>The <code>unattended-upgrades</code> package automatically installs security updates to keep the system patched without manual intervention. This configuration enables automatic security updates while preventing automatic reboots, giving you control over when the server restarts.</p>
+<p>Write the unattended-upgrades configuration.</p>
+<pre><code>Unattended-Upgrade::Allowed-Origins {
+&quot;${distro_id}:${distro_codename}&quot;;
+&quot;${distro_id}:${distro_codename}-security&quot;;
+};
+Unattended-Upgrade::AutoFixInterruptedDpkg &quot;true&quot;;
+Unattended-Upgrade::MinimalSteps &quot;true&quot;;
+Unattended-Upgrade::Remove-Unused-Kernel-Packages &quot;true&quot;;
+Unattended-Upgrade::Remove-Unused-Dependencies &quot;true&quot;;
+Unattended-Upgrade::Automatic-Reboot &quot;false&quot;;
+</code></pre>
+<pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'Unattended-Upgrade::Allowed-Origins {
+"${distro_id}:${distro_codename}";
+"${distro_id}:${distro_codename}-security";
+};
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+Unattended-Upgrade::MinimalSteps "true";
+Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Automatic-Reboot "false";'</span> <span class="token operator">></span> /etc/apt/apt.conf.d/50unattended-upgrades
+<span class="token function">chmod</span> <span class="token number">644</span> /etc/apt/apt.conf.d/50unattended-upgrades
+<span class="token function">chown</span> root:root /etc/apt/apt.conf.d/50unattended-upgrades</code></pre>
+<p>Write the automatic update schedule configuration.</p>
+<pre><code>APT::Periodic::Update-Package-Lists &quot;1&quot;;
+APT::Periodic::Download-Upgradeable-Packages &quot;1&quot;;
+APT::Periodic::AutocleanInterval &quot;7&quot;;
+APT::Periodic::Unattended-Upgrade &quot;1&quot;;
+</code></pre>
+<pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";'</span> <span class="token operator">></span> /etc/apt/apt.conf.d/20auto-upgrades
+<span class="token function">chmod</span> <span class="token number">644</span> /etc/apt/apt.conf.d/20auto-upgrades
+<span class="token function">chown</span> root:root /etc/apt/apt.conf.d/20auto-upgrades</code></pre>
+<p>Enable and start the service.</p>
+<pre class="language-bash"><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> unattended-upgrades
+systemctl start unattended-upgrades</code></pre>
+<p>Validate that the service is running.</p>
+<pre class="language-bash"><code class="language-bash">systemctl status unattended-upgrades</code></pre>
+<p>You should see <code>active (running)</code> in the output. Verify the automatic upgrade configuration is recognised.</p>
+<pre class="language-bash"><code class="language-bash">apt-config dump APT::Periodic::Unattended-Upgrade</code></pre>
+<p>This should return <code>APT::Periodic::Unattended-Upgrade &quot;1&quot;;</code> confirming automatic upgrades are enabled.</p>
+<h3>Enable System Statistics</h3>
+<p>The <code>sysstat</code> package collects system performance and activity data, providing valuable metrics for monitoring CPU, memory, disk I/O, and network usage over time. Enable the service.</p>
+<pre class="language-bash"><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> sysstat
+systemctl start sysstat</code></pre>
+<p>Configure sysstat to retain 28 days of history instead of the default 7 days.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">sed</span> <span class="token parameter variable">-i</span> <span class="token string">'s/^HISTORY=.*/HISTORY=28/'</span> /etc/sysstat/sysstat</code></pre>
+<p>Verify the configuration change.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">grep</span> HISTORY /etc/sysstat/sysstat</code></pre>
+<p>This should return <code>HISTORY=28</code>.</p>
+<h3>Install Podman</h3>
+<p>Podman is a container engine and an alternative to Docker. Install the required packages.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> <span class="token function">install</span> <span class="token function">podman</span> passt uidmap dbus-user-session systemd-container</code></pre>
+<p>Configure subordinate user and group ID ranges for the application user to enable rootless container operation.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">usermod</span> --add-subuids <span class="token number">100000</span>-165535 <span class="token string">"<span class="token variable">$APP_USER</span>"</span>
+<span class="token function">usermod</span> --add-subgids <span class="token number">100000</span>-165535 <span class="token string">"<span class="token variable">$APP_USER</span>"</span></code></pre>
+<p>Enable lingering for the application user. This allows this user's systemd manager to be spawned at boot time and keep running after this user has logged out.</p>
+<pre class="language-bash"><code class="language-bash">loginctl enable-linger <span class="token string">"<span class="token variable">$APP_USER</span>"</span></code></pre>
+<p>Allow rootless Podman to bind to privileged ports below 1024.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">"# Allow rootless Podman to bind to privileged ports (&lt; 1024)
+net.ipv4.ip_unprivileged_port_start=80"</span> <span class="token operator">></span> /etc/sysctl.d/99-podman.conf
+<span class="token function">sysctl</span> <span class="token parameter variable">--system</span></code></pre>
+<p>Create the Podman storage configuration for the application user.</p>
+<p>Create the required directories.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">mkdir</span> <span class="token parameter variable">-p</span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.config/containers"</span>
+<span class="token function">mkdir</span> <span class="token parameter variable">-p</span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.local/share/containers/storage"</span>
+<span class="token function">chmod</span> <span class="token number">755</span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.config/containers"</span></code></pre>
+<p>Write the storage configuration file.</p>
+<pre><code>[storage]
+driver = &quot;overlay&quot;
+runroot = &quot;/run/user/$APP_USER_UID/containers&quot;
+graphroot = &quot;$HOME/.local/share/containers/storage&quot;
+</code></pre>
+<pre class="language-bash"><code class="language-bash"><span class="token assign-left variable">APP_USER_UID</span><span class="token operator">=</span><span class="token variable"><span class="token variable">$(</span><span class="token function">id</span> <span class="token parameter variable">-u</span> <span class="token string">"<span class="token variable">$APP_USER</span>"</span><span class="token variable">)</span></span>
+<span class="token builtin class-name">echo</span> <span class="token string">"[storage]
+driver = <span class="token entity" title="\&quot;">\"</span>overlay<span class="token entity" title="\&quot;">\"</span>
+runroot = <span class="token entity" title="\&quot;">\"</span>/run/user/<span class="token variable">$APP_USER_UID</span>/containers<span class="token entity" title="\&quot;">\"</span>
+graphroot = <span class="token entity" title="\&quot;">\"</span>\<span class="token environment constant">$HOME</span>/.local/share/containers/storage<span class="token entity" title="\&quot;">\"</span>"</span> <span class="token operator">></span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.config/containers/storage.conf"</span>
+<span class="token function">chmod</span> <span class="token number">644</span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.config/containers/storage.conf"</span></code></pre>
+<p>Set proper ownership.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">chown</span> <span class="token parameter variable">-R</span> <span class="token string">"<span class="token variable">$APP_USER</span>:<span class="token variable">$APP_USER</span>"</span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.config"</span>
+<span class="token function">chown</span> <span class="token parameter variable">-R</span> <span class="token string">"<span class="token variable">$APP_USER</span>:<span class="token variable">$APP_USER</span>"</span> <span class="token string">"/home/<span class="token variable">$APP_USER</span>/.local"</span></code></pre>
+<p>Validate the Podman installation by running a test container as the application user. Use <code>machinectl</code> to start a login shell as the application user with proper systemd user session initialization.</p>
+<pre class="language-bash"><code class="language-bash">machinectl shell <span class="token string">"<span class="token variable">$APP_USER</span>@"</span></code></pre>
+<p>Run a <code>hello-world</code> container to ensure Podman is working.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">podman</span> run <span class="token parameter variable">--rm</span> hello-world</code></pre>
+<p>If successful, you should see a welcome message from the container. Exit the application user's shell.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">exit</span></code></pre>
+<h3>Post Installation Tasks</h3>
+<p>With the server configuration complete, a reboot ensures all changes take effect cleanly. After rebooting, reconnect using the newly configured admin user and SSH port. With the admin user established, it's time to audit and clean up any provisioning users (like <code>debian</code>) that may have been created by the cloud provider, and ensure the <code>root</code> account doesn't contain any SSH keys that would allow direct access.</p>
+<p>Reboot the server.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">reboot</span></code></pre>
+<p>After the server comes back online, reconnect using the admin user on the new SSH port. These variables won't be set
+in your host. Replace them with the correct values.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">ssh</span> <span class="token parameter variable">-p</span> <span class="token variable">$SSH_PORT</span> <span class="token variable">$ADMIN_USER</span>@<span class="token variable">$SERVER_IP</span></code></pre>
+<p>Once connected, check for other interactive users with login shells that can be deleted.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">grep</span> <span class="token parameter variable">-E</span> <span class="token string">'/bin/(bash|sh|fish|zsh)'</span> /etc/passwd</code></pre>
+<p>If you see any provisioning users like <code>debian</code> that are no longer needed, remove them.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">userdel</span> <span class="token parameter variable">-r</span> debian</code></pre>
+<p>Finally, ensure the <code>root</code> account doesn't contain any SSH keys in its authorized keys file.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">rm</span> /root/.ssh/authorized_keys</code></pre>
 
   </div>
 
