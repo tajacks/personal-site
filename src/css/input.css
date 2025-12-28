@@ -258,3 +258,8 @@ pre[class*="language-"] {
 .token.italic {
   font-style: italic;
 }
+
+/* Override Prism.js margins for prose content */
+.prose pre[class*="language-"] {
+  margin: 0 0 1.5rem 0;
+}
