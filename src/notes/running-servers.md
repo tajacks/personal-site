@@ -1,5 +1,5 @@
 ---
-layout: note.njk
+layout: variable-note.njk
 title: "Running Servers"
 category: Infrastructure
 description: "How I structure, setup, and maintain my servers"
@@ -7,13 +7,75 @@ tags:
   - infrastructure
   - servers
 created: 2025-12-28
+variables:
+  - name: ADMIN_USER
+    description: "Your admin username (e.g., thomas)"
+  - name: ADMIN_USER_COMMENT
+    description: "Full name or description for admin user"
+  - name: ADMIN_SSH_KEY
+    description: "Your SSH public key"
+  - name: APP_USER
+    description: "Application user name (e.g., app)"
+  - name: SSH_PORT
+    description: "Custom SSH port number (e.g., 2222)"
+  - name: SERVER_IP
+    description: "Your server's IP address"
 ---
 
 ## Introduction
 
+This guide is a document for myself to capture what I know about running and managing 
+servers. It is used to document my personal architecture, setup, hardening, and ongoing maintenance procedures for hobby
+servers.
+
+It is not versioned and the current state reflects how I do things today. It is subject to change.
+
+### Automation Tools
+
+The steps in this note are intended to be manually executed. I've experimented with a variety of automation tools to 
+provision new servers (ansible, bash scripts, cloud-init, etc), and while they certainly are _neat_, they don't bring me
+enough value. Setting up a new server manually takes ~30 minutes if you're decent on the command line (a skill 
+which setting up the server helps improve!) and I have found little to match the familiarity you build with your 
+infrastructure when you configure it manually.
+
+I think of it like a construction project. If you were to do a small to medium-sized home renovation, it's likely worth 
+learning the skills to do much of the work yourself. You save money, learn new things, and know exactly what's going on 
+behind the walls. If you outsource the work, you declare the end state you wish to receive and the builder 
+(automation tool in this analogy) makes it so. While this works great for large projects, for small endeavours the 
+overhead of managing the builder, communicating requirements, and trusting work you didn't see happen can outweigh the 
+time saved. Similarly, declarative automation tools require investment in learning their syntax and maintaining their 
+configurations — time that may exceed the manual work they replace, especially when you only provision a server once 
+every few years.
+
+This philosophy works where ultimately the stakes and volume of work are low. If I had to run a business to support my 
+livelihood, or provision tens to hundreds of servers, I would undoubtedly reach for an alternative.
+
+For personal-use servers, it's great.
+
+### Variable Usage
+
+Setting shell variables can be skipped if you have configured custom values for all variables by using the
+button at the top of this guide.
+
+If setting variables in the shell, set the following to non-empty values.
+
+```bash
+ADMIN_USER=""           # I use 'tjack'
+ADMIN_USER_COMMENT=""   # I use 'Thomas Jack'
+ADMIN_SSH_KEY=""        # I use my personal SSH key
+APP_USER=""             # I use 'app'
+SSH_PORT=""             # I use 2222
+```
+
 ---
 
 ## Initial Setup
+
+This section is intended to bring your server from the initial configuration to a hardened base with core configurations that are ready to be built upon.
+
+The commands in this section should be executed as the `root` user.
+
+### System Updates
 
 Update the `apt` cache.
 
@@ -142,50 +204,6 @@ cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
 Install the configuration, overwriting the current file.
 
-```
-# Hardened SSH Configuration
-# Network
-Port $SSH_PORT
-AddressFamily any
-ListenAddress 0.0.0.0
-ListenAddress ::
-# Host Keys
-HostKey /etc/ssh/ssh_host_ed25519_key
-HostKey /etc/ssh/ssh_host_ecdsa_key
-HostKey /etc/ssh/ssh_host_rsa_key
-# Ciphers and keying
-KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
-Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
-# Authentication
-PermitRootLogin no
-PubkeyAuthentication yes
-PasswordAuthentication no
-PermitEmptyPasswords no
-ChallengeResponseAuthentication no
-UsePAM yes
-# Security settings
-MaxAuthTries 3
-MaxSessions 10
-LoginGraceTime 60
-ClientAliveInterval 300
-ClientAliveCountMax 2
-MaxStartups 10:30:60
-# Access control
-AllowUsers $ADMIN_USER
-# Logging
-SyslogFacility AUTH
-LogLevel VERBOSE
-# Disable unnecessary features
-X11Forwarding no
-PrintMotd no
-PrintLastLog yes
-TCPKeepAlive yes
-AcceptEnv LANG LC_*
-# Subsystem
-Subsystem sftp /usr/lib/openssh/sftp-server
-```
-
 ```bash
 echo '# Hardened SSH Configuration
 # Network
@@ -243,22 +261,6 @@ If the connection succeeds, you can safely continue. If it fails, you still have
 
 fail2ban is a utility which monitors for unsuccessful SSH attempts in your authentication logs and temporarily bans IP
 addresses which exceed a threshold. Write the configuration file.
-
-```
-[DEFAULT]
-bantime = 3600
-findtime = 600
-maxretry = 5
-destemail = root@localhost
-sendername = Fail2Ban
-action = %(action_)s
-[sshd]
-enabled = true
-port = $SSH_PORT
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 5
-```
 
 ```bash
 echo '[DEFAULT]
@@ -347,18 +349,6 @@ The `unattended-upgrades` package automatically installs security updates to kee
 
 Write the unattended-upgrades configuration.
 
-```
-Unattended-Upgrade::Allowed-Origins {
-"${distro_id}:${distro_codename}";
-"${distro_id}:${distro_codename}-security";
-};
-Unattended-Upgrade::AutoFixInterruptedDpkg "true";
-Unattended-Upgrade::MinimalSteps "true";
-Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
-Unattended-Upgrade::Remove-Unused-Dependencies "true";
-Unattended-Upgrade::Automatic-Reboot "false";
-```
-
 ```bash
 echo 'Unattended-Upgrade::Allowed-Origins {
 "${distro_id}:${distro_codename}";
@@ -374,13 +364,6 @@ chown root:root /etc/apt/apt.conf.d/50unattended-upgrades
 ```
 
 Write the automatic update schedule configuration.
-
-```
-APT::Periodic::Update-Package-Lists "1";
-APT::Periodic::Download-Upgradeable-Packages "1";
-APT::Periodic::AutocleanInterval "7";
-APT::Periodic::Unattended-Upgrade "1";
-```
 
 ```bash
 echo 'APT::Periodic::Update-Package-Lists "1";
@@ -554,4 +537,3 @@ Finally, ensure the `root` account doesn't contain any SSH keys in its authorize
 ```bash
 sudo rm /root/.ssh/authorized_keys
 ```
-

@@ -54,7 +54,14 @@
 
   <article>
   <header class="mb-8">
-    <h1 class="text-3xl font-bold text-text-primary mb-3">Running Servers</h1>
+    <div class="flex items-start justify-between gap-4 mb-3">
+      <h1 class="text-3xl font-bold text-text-primary">Running Servers</h1>
+      
+      <button id="customize-vars-btn" class="btn-customize flex-shrink-0">
+        Customize Variables
+      </button>
+      
+    </div>
 
     
     <div class="flex flex-wrap gap-2 mb-4">
@@ -78,10 +85,43 @@
     </div>
   </header>
 
-  <div class="prose">
+  <div class="prose" id="prose-content">
     <h2>Introduction</h2>
+<p>This guide is a document for myself to capture what I know about running and managing
+servers. It is used to document my personal architecture, setup, hardening, and ongoing maintenance procedures for hobby
+servers.</p>
+<p>It is not versioned and the current state reflects how I do things today. It is subject to change.</p>
+<h3>Automation Tools</h3>
+<p>The steps in this note are intended to be manually executed. I've experimented with a variety of automation tools to
+provision new servers (ansible, bash scripts, cloud-init, etc), and while they certainly are <em>neat</em>, they don't bring me
+enough value. Setting up a new server manually takes ~30 minutes if you're decent on the command line (a skill
+which setting up the server helps improve!) and I have found little to match the familiarity you build with your
+infrastructure when you configure it manually.</p>
+<p>I think of it like a construction project. If you were to do a small to medium-sized home renovation, it's likely worth
+learning the skills to do much of the work yourself. You save money, learn new things, and know exactly what's going on
+behind the walls. If you outsource the work, you declare the end state you wish to receive and the builder
+(automation tool in this analogy) makes it so. While this works great for large projects, for small endeavours the
+overhead of managing the builder, communicating requirements, and trusting work you didn't see happen can outweigh the
+time saved. Similarly, declarative automation tools require investment in learning their syntax and maintaining their
+configurations — time that may exceed the manual work they replace, especially when you only provision a server once
+every few years.</p>
+<p>This philosophy works where ultimately the stakes and volume of work are low. If I had to run a business to support my
+livelihood, or provision tens to hundreds of servers, I would undoubtedly reach for an alternative.</p>
+<p>For personal-use servers, it's great.</p>
+<h3>Variable Usage</h3>
+<p>Setting shell variables can be skipped if you have configured custom values for all variables by using the
+button at the top of this guide.</p>
+<p>If setting variables in the shell, set the following to non-empty values.</p>
+<pre class="language-bash"><code class="language-bash"><span class="token assign-left variable">ADMIN_USER</span><span class="token operator">=</span><span class="token string">""</span>           <span class="token comment"># I use 'tjack'</span>
+<span class="token assign-left variable">ADMIN_USER_COMMENT</span><span class="token operator">=</span><span class="token string">""</span>   <span class="token comment"># I use 'Thomas Jack'</span>
+<span class="token assign-left variable">ADMIN_SSH_KEY</span><span class="token operator">=</span><span class="token string">""</span>        <span class="token comment"># I use my personal SSH key</span>
+<span class="token assign-left variable">APP_USER</span><span class="token operator">=</span><span class="token string">""</span>             <span class="token comment"># I use 'app'</span>
+<span class="token assign-left variable">SSH_PORT</span><span class="token operator">=</span><span class="token string">""</span>             <span class="token comment"># I use 2222</span></code></pre>
 <hr>
 <h2>Initial Setup</h2>
+<p>This section is intended to bring your server from the initial configuration to a hardened base with core configurations that are ready to be built upon.</p>
+<p>The commands in this section should be executed as the <code>root</code> user.</p>
+<h3>System Updates</h3>
 <p>Update the <code>apt</code> cache.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">apt</span> update</code></pre>
 <p>Upgrade the system, using this upgrade command to remove packages if it is necessary.</p>
@@ -205,48 +245,6 @@ which constantly attempt to find servers with open or weakly configured SSH acce
 <p>Take a backup of the configuration which shipped with the server before modifying it.</p>
 <pre class="language-bash"><code class="language-bash"><span class="token function">cp</span> /etc/ssh/sshd_config /etc/ssh/sshd_config.bak</code></pre>
 <p>Install the configuration, overwriting the current file.</p>
-<pre><code># Hardened SSH Configuration
-# Network
-Port $SSH_PORT
-AddressFamily any
-ListenAddress 0.0.0.0
-ListenAddress ::
-# Host Keys
-HostKey /etc/ssh/ssh_host_ed25519_key
-HostKey /etc/ssh/ssh_host_ecdsa_key
-HostKey /etc/ssh/ssh_host_rsa_key
-# Ciphers and keying
-KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
-Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
-# Authentication
-PermitRootLogin no
-PubkeyAuthentication yes
-PasswordAuthentication no
-PermitEmptyPasswords no
-ChallengeResponseAuthentication no
-UsePAM yes
-# Security settings
-MaxAuthTries 3
-MaxSessions 10
-LoginGraceTime 60
-ClientAliveInterval 300
-ClientAliveCountMax 2
-MaxStartups 10:30:60
-# Access control
-AllowUsers $ADMIN_USER
-# Logging
-SyslogFacility AUTH
-LogLevel VERBOSE
-# Disable unnecessary features
-X11Forwarding no
-PrintMotd no
-PrintLastLog yes
-TCPKeepAlive yes
-AcceptEnv LANG LC_*
-# Subsystem
-Subsystem sftp /usr/lib/openssh/sftp-server
-</code></pre>
 <pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'# Hardened SSH Configuration
 # Network
 Port $SSH_PORT
@@ -295,20 +293,6 @@ systemctl reload <span class="token function">ssh</span></code></pre>
 <h3>Setup fail2ban</h3>
 <p>fail2ban is a utility which monitors for unsuccessful SSH attempts in your authentication logs and temporarily bans IP
 addresses which exceed a threshold. Write the configuration file.</p>
-<pre><code>[DEFAULT]
-bantime = 3600
-findtime = 600
-maxretry = 5
-destemail = root@localhost
-sendername = Fail2Ban
-action = %(action_)s
-[sshd]
-enabled = true
-port = $SSH_PORT
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 5
-</code></pre>
 <pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'[DEFAULT]
 bantime = 3600
 findtime = 600
@@ -355,16 +339,6 @@ ufw allow <span class="token number">443</span>/tcp comment <span class="token s
 <h3>Configure Automatic Updates</h3>
 <p>The <code>unattended-upgrades</code> package automatically installs security updates to keep the system patched without manual intervention. This configuration enables automatic security updates while preventing automatic reboots, giving you control over when the server restarts.</p>
 <p>Write the unattended-upgrades configuration.</p>
-<pre><code>Unattended-Upgrade::Allowed-Origins {
-&quot;${distro_id}:${distro_codename}&quot;;
-&quot;${distro_id}:${distro_codename}-security&quot;;
-};
-Unattended-Upgrade::AutoFixInterruptedDpkg &quot;true&quot;;
-Unattended-Upgrade::MinimalSteps &quot;true&quot;;
-Unattended-Upgrade::Remove-Unused-Kernel-Packages &quot;true&quot;;
-Unattended-Upgrade::Remove-Unused-Dependencies &quot;true&quot;;
-Unattended-Upgrade::Automatic-Reboot &quot;false&quot;;
-</code></pre>
 <pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'Unattended-Upgrade::Allowed-Origins {
 "${distro_id}:${distro_codename}";
 "${distro_id}:${distro_codename}-security";
@@ -377,11 +351,6 @@ Unattended-Upgrade::Automatic-Reboot "false";'</span> <span class="token operato
 <span class="token function">chmod</span> <span class="token number">644</span> /etc/apt/apt.conf.d/50unattended-upgrades
 <span class="token function">chown</span> root:root /etc/apt/apt.conf.d/50unattended-upgrades</code></pre>
 <p>Write the automatic update schedule configuration.</p>
-<pre><code>APT::Periodic::Update-Package-Lists &quot;1&quot;;
-APT::Periodic::Download-Upgradeable-Packages &quot;1&quot;;
-APT::Periodic::AutocleanInterval &quot;7&quot;;
-APT::Periodic::Unattended-Upgrade &quot;1&quot;;
-</code></pre>
 <pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token string">'APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Download-Upgradeable-Packages "1";
 APT::Periodic::AutocleanInterval "7";
@@ -462,6 +431,133 @@ in your host. Replace them with the correct values.</p>
   
 </article>
 </div>
+
+
+<!-- Variable customization modal -->
+<div id="var-modal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="text-lg font-semibold text-text-primary">Customize Variables</h2>
+      <button id="modal-close" class="text-text-muted hover:text-text-primary transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <form id="var-form" class="modal-body">
+      
+      <div class="mb-4">
+        <label for="var-ADMIN_USER" class="block text-sm font-medium text-text-secondary mb-1">
+          $ADMIN_USER
+        </label>
+        
+        <p class="text-xs text-text-muted mb-2">Your admin username (e.g., thomas)</p>
+        
+        <input
+          type="text"
+          id="var-ADMIN_USER"
+          name="ADMIN_USER"
+          class="var-input"
+          placeholder="$ADMIN_USER"
+        >
+      </div>
+      
+      <div class="mb-4">
+        <label for="var-ADMIN_USER_COMMENT" class="block text-sm font-medium text-text-secondary mb-1">
+          $ADMIN_USER_COMMENT
+        </label>
+        
+        <p class="text-xs text-text-muted mb-2">Full name or description for admin user</p>
+        
+        <input
+          type="text"
+          id="var-ADMIN_USER_COMMENT"
+          name="ADMIN_USER_COMMENT"
+          class="var-input"
+          placeholder="$ADMIN_USER_COMMENT"
+        >
+      </div>
+      
+      <div class="mb-4">
+        <label for="var-ADMIN_SSH_KEY" class="block text-sm font-medium text-text-secondary mb-1">
+          $ADMIN_SSH_KEY
+        </label>
+        
+        <p class="text-xs text-text-muted mb-2">Your SSH public key</p>
+        
+        <input
+          type="text"
+          id="var-ADMIN_SSH_KEY"
+          name="ADMIN_SSH_KEY"
+          class="var-input"
+          placeholder="$ADMIN_SSH_KEY"
+        >
+      </div>
+      
+      <div class="mb-4">
+        <label for="var-APP_USER" class="block text-sm font-medium text-text-secondary mb-1">
+          $APP_USER
+        </label>
+        
+        <p class="text-xs text-text-muted mb-2">Application user name (e.g., app)</p>
+        
+        <input
+          type="text"
+          id="var-APP_USER"
+          name="APP_USER"
+          class="var-input"
+          placeholder="$APP_USER"
+        >
+      </div>
+      
+      <div class="mb-4">
+        <label for="var-SSH_PORT" class="block text-sm font-medium text-text-secondary mb-1">
+          $SSH_PORT
+        </label>
+        
+        <p class="text-xs text-text-muted mb-2">Custom SSH port number (e.g., 2222)</p>
+        
+        <input
+          type="text"
+          id="var-SSH_PORT"
+          name="SSH_PORT"
+          class="var-input"
+          placeholder="$SSH_PORT"
+        >
+      </div>
+      
+      <div class="mb-4">
+        <label for="var-SERVER_IP" class="block text-sm font-medium text-text-secondary mb-1">
+          $SERVER_IP
+        </label>
+        
+        <p class="text-xs text-text-muted mb-2">Your server&#39;s IP address</p>
+        
+        <input
+          type="text"
+          id="var-SERVER_IP"
+          name="SERVER_IP"
+          class="var-input"
+          placeholder="$SERVER_IP"
+        >
+      </div>
+      
+    </form>
+    <div class="modal-footer">
+      <button type="button" id="modal-reset" class="btn btn-outline">Reset</button>
+      <div class="flex gap-2">
+        <button type="button" id="modal-cancel" class="btn btn-outline">Cancel</button>
+        <button type="button" id="modal-save" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pass variables config to JavaScript -->
+<script id="variables-config" type="application/json">
+[{"name":"ADMIN_USER","description":"Your admin username (e.g., thomas)"},{"name":"ADMIN_USER_COMMENT","description":"Full name or description for admin user"},{"name":"ADMIN_SSH_KEY","description":"Your SSH public key"},{"name":"APP_USER","description":"Application user name (e.g., app)"},{"name":"SSH_PORT","description":"Custom SSH port number (e.g., 2222)"},{"name":"SERVER_IP","description":"Your server's IP address"}]
+</script>
+<script src="/assets/js/variable-note.js"></script>
 
 
   </main>
