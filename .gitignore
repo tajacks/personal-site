@@ -17,3 +17,6 @@ npm-debug.log*
 
 # Deployment script
 deploy.sh
+
+# Site content
+_site
