@@ -24,7 +24,7 @@ variables:
 
 ## Introduction
 
-This guide is a document for myself to capture what I know about running and managing 
+This guide is a document for myself to capture what I know about running and managing
 servers. It is used to document my personal architecture, setup, hardening, and ongoing maintenance procedures for hobby
 servers.
 
@@ -32,22 +32,22 @@ It is not versioned and the current state reflects how I do things today. It is 
 
 ### Automation Tools
 
-The steps in this note are intended to be manually executed. I've experimented with a variety of automation tools to 
+The steps in this note are intended to be manually executed. I've experimented with a variety of automation tools to
 provision new servers (ansible, bash scripts, cloud-init, etc), and while they certainly are _neat_, they don't bring me
-enough value. Setting up a new server manually takes ~30 minutes if you're decent on the command line (a skill 
-which setting up the server helps improve!) and I have found little to match the familiarity you build with your 
+enough value. Setting up a new server manually takes ~30 minutes if you're decent on the command line (a skill
+which setting up the server helps improve!) and I have found little to match the familiarity you build with your
 infrastructure when you configure it manually.
 
-I think of it like a construction project. If you were to do a small to medium-sized home renovation, it's likely worth 
-learning the skills to do much of the work yourself. You save money, learn new things, and know exactly what's going on 
-behind the walls. If you outsource the work, you declare the end state you wish to receive and the builder 
-(automation tool in this analogy) makes it so. While this works great for large projects, for small endeavours the 
-overhead of managing the builder, communicating requirements, and trusting work you didn't see happen can outweigh the 
-time saved. Similarly, declarative automation tools require investment in learning their syntax and maintaining their 
-configurations — time that may exceed the manual work they replace, especially when you only provision a server once 
+I think of it like a construction project. If you were to do a small to medium-sized home renovation, it's likely worth
+learning the skills to do much of the work yourself. You save money, learn new things, and know exactly what's going on
+behind the walls. If you outsource the work, you declare the end state you wish to receive and the builder
+(automation tool in this analogy) makes it so. While this works great for large projects, for small endeavours the
+overhead of managing the builder, communicating requirements, and trusting work you didn't see happen can outweigh the
+time saved. Similarly, declarative automation tools require investment in learning their syntax and maintaining their
+configurations — time that may exceed the manual work they replace, especially when you only provision a server once
 every few years.
 
-This philosophy works where ultimately the stakes and volume of work are low. If I had to run a business to support my 
+This philosophy works where ultimately the stakes and volume of work are low. If I had to run a business to support my
 livelihood, or provision tens to hundreds of servers, I would undoubtedly reach for an alternative.
 
 For personal-use servers, it's great.
@@ -62,7 +62,7 @@ If setting variables in the shell, set the following to non-empty values.
 ```bash
 ADMIN_USER=""           # I use 'tjack'
 ADMIN_USER_COMMENT=""   # I use 'Thomas Jack'
-ADMIN_SSH_KEY=""        # I use my personal SSH key
+ADMIN_SSH_KEY=""        # I use my personal SSH public key
 APP_USER=""             # I use 'app'
 SSH_PORT=""             # I use 2222
 ```
@@ -71,31 +71,32 @@ SSH_PORT=""             # I use 2222
 
 ## Initial Setup
 
-This section is intended to bring your server from the initial configuration to a hardened base with core configurations that are ready to be built upon.
+This section is intended to bring your server from the initial configuration to a hardened base with core configurations
+that are ready to be built upon.
 
 The commands in this section should be executed as the `root` user.
 
 ### System Updates
 
-Update the `apt` cache.
+Update the `apt` cache to retrieve the latest versions of available packages.
 
 ```bash
 apt update
 ```
 
-Upgrade the system, using this upgrade command to remove packages if it is necessary.
+Upgrade installed packages to their latest versions.
 
 ```bash
-apt full-upgrade
+apt upgrade
 ```
 
-Clean the local repository of files that can no longer be downloaded.
+Clean the local repository of packages that can no longer be downloaded.
 
 ```bash
 apt autoclean
 ```
 
-Remove any packages which were installed as a dependency of another package which are no longer needed.
+Remove any packages which were installed as a dependency of another package and are no longer needed.
 
 ```bash
 apt autoremove
@@ -144,7 +145,8 @@ vim
 
 ### Create Admin User
 
-The admin user will have privileged access to the server but does not run applications. This user will be configured to run `sudo` commands without a password prompt.
+The admin user will have privileged access to the server but does not run applications. This user will be configured to
+run `sudo` commands without a password prompt.
 
 Create the user with a home directory.
 
@@ -162,6 +164,11 @@ Configure passwordless `sudo` for the admin user.
 
 ```bash
 echo "$ADMIN_USER ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/$ADMIN_USER"
+```
+
+Set the correct file permissions.
+
+```bash
 chmod 0440 "/etc/sudoers.d/$ADMIN_USER"
 ```
 
@@ -177,13 +184,19 @@ Add the admin user's key to the authorized keys file.
 
 ```bash
 echo "$ADMIN_SSH_KEY" > "/home/$ADMIN_USER/.ssh/authorized_keys"
+```
+
+Set the correct file permissions and ownership.
+
+```bash
 chmod 600 "/home/$ADMIN_USER/.ssh/authorized_keys"
 chown "$ADMIN_USER:$ADMIN_USER" "/home/$ADMIN_USER/.ssh/authorized_keys"
 ```
 
 ### Create Application User
 
-The application user will be a non-privileged user that runs containerized applications. This user has no `sudo` access and is isolated from administrative functions.
+The application user will be a non-privileged user that runs containerized applications. This user has no `sudo` access
+and is isolated from administrative functions.
 
 Create the user with a home directory.
 
@@ -191,10 +204,18 @@ Create the user with a home directory.
 useradd -m -s /usr/bin/bash -c "Application User" "$APP_USER"
 ```
 
+Enable lingering for the application user. This allows this user's systemd manager to be spawned at boot time and keep
+running after this user has logged out.
+
+```bash
+loginctl enable-linger "$APP_USER"
+```
+
 ### SSH Hardening
 
-Hardening SSH access includes changing the default port, allowing only specific users to connect via SSH, and more. These changes can prevent the bulk of bots and scanners
-which constantly attempt to find servers with open or weakly configured SSH access across the internet.
+Hardening SSH access includes changing the default port, allowing only specific users to connect via SSH, disallowing
+password based authentication, and more. These changes can prevent the bulk of bots and scanners which constantly
+attempt to find servers with open or weakly configured SSH access across the internet.
 
 Take a backup of the configuration which shipped with the server before modifying it.
 
@@ -205,7 +226,8 @@ cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 Install the configuration, overwriting the current file.
 
 ```bash
-echo '# Hardened SSH Configuration
+cat > /etc/ssh/sshd_config <<EOF
+# Hardened SSH Configuration
 # Network
 Port $SSH_PORT
 AddressFamily any
@@ -245,7 +267,8 @@ PrintLastLog yes
 TCPKeepAlive yes
 AcceptEnv LANG LC_*
 # Subsystem
-Subsystem sftp /usr/lib/openssh/sftp-server' > /etc/ssh/sshd_config
+Subsystem sftp /usr/lib/openssh/sftp-server
+EOF
 ```
 
 Ensure the SSH service is enabled and reload the configuration.
@@ -255,7 +278,8 @@ systemctl enable ssh
 systemctl reload ssh
 ```
 
-If the connection succeeds, you can safely continue. If it fails, you still have your current session connected to fix any configuration issues.
+If the connection succeeds, you can safely continue. If it fails, you still have your current session connected to fix
+any configuration issues.
 
 ### Setup fail2ban
 
@@ -263,19 +287,15 @@ fail2ban is a utility which monitors for unsuccessful SSH attempts in your authe
 addresses which exceed a threshold. Write the configuration file.
 
 ```bash
-echo '[DEFAULT]
-bantime = 3600
-findtime = 600
-maxretry = 5
-destemail = root@localhost
-sendername = Fail2Ban
-action = %(action_)s
+cat > /etc/fail2ban/jail.local <<EOF
 [sshd]
 enabled = true
 port = $SSH_PORT
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 5' > /etc/fail2ban/jail.local
+backend = systemd
+maxretry = 5
+findtime = 10m
+bantime = 1h
+EOF
 ```
 
 Set file permissions and ownership.
@@ -298,10 +318,16 @@ Check if fail2ban is running.
 systemctl status fail2ban
 ```
 
+Ensure the fail2ban SSH configuration is loaded.
+
+```bash
+fail2ban-client status sshd
+```
+
 ### Configure Firewall
 
 `ufw` is the utility used for controlling the host firewall. A good starting place is to allow all outbound traffic,
-deny all inbound traffic, and then selectively allow SSH + web traffic to your server. If your server will not serve
+deny all inbound traffic, and then selectively allow SSH & web traffic to your server. If your server does not serve
 web content, those rules can be omitted.
 
 Set the default policies to deny incoming and allow outgoing traffic.
@@ -333,7 +359,8 @@ ufw status verbose
 
 ### Secure File Permissions
 
-Set secure file permissions. The files may already have their permissions set appropriately, but nonetheless, it is good defensive practice to set them explicitly.
+Set secure file permissions. The files may already have their permissions set appropriately, but nonetheless, it is good
+defensive practice to set them explicitly.
 
 ```bash
 chmod 644 /etc/passwd
@@ -345,32 +372,56 @@ chmod 600 /etc/ssh/sshd_config
 
 ### Configure Automatic Updates
 
-The `unattended-upgrades` package automatically installs security updates to keep the system patched without manual intervention. This configuration enables automatic security updates while preventing automatic reboots, giving you control over when the server restarts.
+The `unattended-upgrades` package automatically installs updates to keep the system patched without manual intervention.
+This configuration enables automatic security updates while preventing automatic reboots, giving you control over when
+the server restarts.
+
+Reconfigure unattended-upgrades. Select 'Yes' in the dialog box.
+
+```bash
+dpkg-reconfigure -plow unattended-upgrades
+```
+
+Take a backup of the existing configuration files.
+
+```bash
+cp /etc/apt/apt.conf.d/50unattended-upgrades /etc/apt/apt.conf.d/50unattended-upgrades.bak
+cp /etc/apt/apt.conf.d/20auto-upgrades /etc/apt/apt.conf.d/20auto-upgrades.bak
+```
 
 Write the unattended-upgrades configuration.
 
 ```bash
-echo 'Unattended-Upgrade::Allowed-Origins {
-"${distro_id}:${distro_codename}";
-"${distro_id}:${distro_codename}-security";
+cat > /etc/apt/apt.conf.d/50unattended-upgrades <<'EOF'
+Unattended-Upgrade::Origins-Pattern {
+    "origin=Debian,codename=${distro_codename},label=Debian-Security";
+    "origin=Debian,codename=${distro_codename}-security,label=Debian-Security";
 };
 Unattended-Upgrade::AutoFixInterruptedDpkg "true";
 Unattended-Upgrade::MinimalSteps "true";
 Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
 Unattended-Upgrade::Remove-Unused-Dependencies "true";
-Unattended-Upgrade::Automatic-Reboot "false";' > /etc/apt/apt.conf.d/50unattended-upgrades
-chmod 644 /etc/apt/apt.conf.d/50unattended-upgrades
-chown root:root /etc/apt/apt.conf.d/50unattended-upgrades
+Unattended-Upgrade::Automatic-Reboot "false";
+EOF
 ```
 
 Write the automatic update schedule configuration.
 
 ```bash
-echo 'APT::Periodic::Update-Package-Lists "1";
+cat > /etc/apt/apt.conf.d/20auto-upgrades <<'EOF'
+APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Download-Upgradeable-Packages "1";
 APT::Periodic::AutocleanInterval "7";
-APT::Periodic::Unattended-Upgrade "1";' > /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+```
+
+Set the correct file permissions and ownership.
+
+```bash
+chmod 644 /etc/apt/apt.conf.d/50unattended-upgrades
 chmod 644 /etc/apt/apt.conf.d/20auto-upgrades
+chown root:root /etc/apt/apt.conf.d/50unattended-upgrades
 chown root:root /etc/apt/apt.conf.d/20auto-upgrades
 ```
 
@@ -395,9 +446,16 @@ apt-config dump APT::Periodic::Unattended-Upgrade
 
 This should return `APT::Periodic::Unattended-Upgrade "1";` confirming automatic upgrades are enabled.
 
+Finally, perform a dry run.
+
+```bash
+unattended-upgrades --dry-run --debug
+```
+
 ### Enable System Statistics
 
-The `sysstat` package collects system performance and activity data, providing valuable metrics for monitoring CPU, memory, disk I/O, and network usage over time. Enable the service.
+The `sysstat` package collects system performance and activity data, providing valuable metrics for monitoring CPU,
+memory, disk I/O, and network usage over time. Enable the service.
 
 ```bash
 systemctl enable sysstat
@@ -418,7 +476,45 @@ grep HISTORY /etc/sysstat/sysstat
 
 This should return `HISTORY=28`.
 
-### Install Podman
+### Post Installation Tasks
+
+With the server configuration complete, a reboot ensures all changes take effect cleanly. After rebooting, reconnect
+using the newly configured admin user and SSH port. With the admin user established, it's time to audit and clean up any
+provisioning users (like `debian`) that may have been created by the cloud provider, and ensure the `root` account
+doesn't contain any SSH keys that would allow direct access.
+
+Reboot the server.
+
+```bash
+reboot
+```
+
+After the server comes back online, reconnect using the admin user on the new SSH port. These variables won't be set
+in your host. Replace them with the correct values.
+
+```bash
+ssh -p $SSH_PORT $ADMIN_USER@$SERVER_IP
+```
+
+Once connected, check for other interactive users with login shells that can be deleted.
+
+```bash
+sudo grep -E '/bin/(bash|sh|fish|zsh)' /etc/passwd
+```
+
+If you see any provisioning users like `debian` that are no longer needed, remove them.
+
+```bash
+sudo userdel -r debian
+```
+
+Finally, ensure the `root` account doesn't contain any SSH keys in its authorized keys file.
+
+```bash
+sudo rm /root/.ssh/authorized_keys
+```
+
+## Install Podman
 
 Podman is a container engine and an alternative to Docker. Install the required packages.
 
@@ -433,17 +529,13 @@ usermod --add-subuids 100000-165535 "$APP_USER"
 usermod --add-subgids 100000-165535 "$APP_USER"
 ```
 
-Enable lingering for the application user. This allows this user's systemd manager to be spawned at boot time and keep running after this user has logged out.
-
-```bash
-loginctl enable-linger "$APP_USER"
-```
-
 Allow rootless Podman to bind to privileged ports below 1024.
 
 ```bash
-echo "# Allow rootless Podman to bind to privileged ports (< 1024)
-net.ipv4.ip_unprivileged_port_start=80" > /etc/sysctl.d/99-podman.conf
+cat > /etc/sysctl.d/99-podman.conf <<'EOF'
+# Allow rootless Podman to bind to privileged ports (< 1024)
+net.ipv4.ip_unprivileged_port_start=80
+EOF
 sysctl --system
 ```
 
@@ -461,21 +553,24 @@ Write the storage configuration file.
 
 ```bash
 APP_USER_UID=$(id -u "$APP_USER")
-echo "[storage]
-driver = \"overlay\"
-runroot = \"/run/user/$APP_USER_UID/containers\"
-graphroot = \"\$HOME/.local/share/containers/storage\"" > "/home/$APP_USER/.config/containers/storage.conf"
-chmod 644 "/home/$APP_USER/.config/containers/storage.conf"
+cat > "/home/$APP_USER/.config/containers/storage.conf" <<EOF
+[storage]
+driver = "overlay"
+runroot = "/run/user/$APP_USER_UID/containers"
+graphroot = "\$HOME/.local/share/containers/storage"
+EOF
 ```
 
-Set proper ownership.
+Set the correct file permissions and ownership.
 
 ```bash
+chmod 644 "/home/$APP_USER/.config/containers/storage.conf"
 chown -R "$APP_USER:$APP_USER" "/home/$APP_USER/.config"
 chown -R "$APP_USER:$APP_USER" "/home/$APP_USER/.local"
 ```
 
-Validate the Podman installation by running a test container as the application user. Use `machinectl` to start a login shell as the application user with proper systemd user session initialization.
+Validate the Podman installation by running a test container as the application user. Use `machinectl` to start a login
+shell as the application user with proper systemd user session initialization.
 
 ```bash
 machinectl shell "$APP_USER@"
@@ -491,42 +586,4 @@ If successful, you should see a welcome message from the container. Exit the app
 
 ```bash
 exit
-```
-
-### Post Installation Tasks
-
-With the server configuration complete, a reboot ensures all changes take effect cleanly. After rebooting, reconnect using the newly configured admin user and SSH port. With the admin user established, it's time to audit and clean up any provisioning users (like `debian`) that may have been created by the cloud provider, and ensure the `root` account doesn't contain any SSH keys that would allow direct access.
-
-Reboot the server.
-
-```bash
-reboot
-```
-
-After the server comes back online, reconnect using the admin user on the new SSH port. These variables won't be set
-in your host. Replace them with the correct values.
-
-```bash
-ssh -p $SSH_PORT $ADMIN_USER@$SERVER_IP
-```
-
-
-Once connected, check for other interactive users with login shells that can be deleted.
-
-```bash
-sudo grep -E '/bin/(bash|sh|fish|zsh)' /etc/passwd
-```
-
-
-If you see any provisioning users like `debian` that are no longer needed, remove them.
-
-```bash
-sudo userdel -r debian
-```
-
-
-Finally, ensure the `root` account doesn't contain any SSH keys in its authorized keys file.
-
-```bash
-sudo rm /root/.ssh/authorized_keys
 ```
