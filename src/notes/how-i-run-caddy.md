@@ -159,6 +159,7 @@ systemctl --user status caddy.service
 
 RANDOM NOTES
 
+```
 sudo tee /etc/fail2ban/filter.d/caddy.conf << 'EOF'
 [Definition]
 failregex = ^.*"client_ip":"<HOST>".*"status":\s*403.*$
@@ -171,14 +172,16 @@ enabled = true
 port = http,https
 filter = caddy
 logpath = /home/app/caddy/logs/*.log
-maxretry = 5
+maxretry = 3
 findtime = 60
-bantime = 1h
+bantime = 1d
 banaction = iptables-multiport
 EOF
+```
 
-sudo systemctl restart fail2ban
+`sudo systemctl restart fail2ban`
 
+```
 app@sandbox:~$ tree
 .
 ├── caddy
@@ -211,7 +214,7 @@ app@sandbox:~$ tree
 └── www
 └── sandbox.thomasjack.ca
 └── index.html
-
+```
 
 ```caddy
 {
