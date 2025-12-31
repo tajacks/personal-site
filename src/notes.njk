@@ -8,11 +8,11 @@ title: Notes
     My personal wiki. Quick references, code snippets, and things worth remembering.
   </p>
 
-  {% if series | length > 0 %}
+  {% if allSeries | length > 0 %}
   <section class="mb-12">
     <h2 class="text-xl font-semibold text-text-primary mb-4">Series</h2>
     <div class="grid gap-4 sm:grid-cols-2">
-      {% for s in series %}
+      {% for s in allSeries %}
       {% set seriesNotes = collections | getSeriesNotes(s.slug) %}
       {% if seriesNotes.length > 0 %}
       <a href="/series/{{ s.slug }}/" class="block p-4 bg-bg-secondary border border-border rounded-lg hover:border-accent-400 transition-colors">

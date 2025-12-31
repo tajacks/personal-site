@@ -6,7 +6,7 @@ layout: base.njk
     <a href="/notes/" class="hover:text-text-secondary transition-colors">&larr; Back to notes</a>
   </nav>
 
-  {% if series %}
+  {% if series is string %}
     {% include "series-nav.njk" %}
   {% endif %}
 
@@ -38,7 +38,7 @@ layout: base.njk
     {{ content | safe }}
   </div>
 
-  {% if series %}
+  {% if series is string %}
     {% include "series-prev-next.njk" %}
   {% endif %}
 

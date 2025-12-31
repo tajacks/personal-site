@@ -88,6 +88,12 @@ export default function(eleventyConfig) {
     return seriesNotes.findIndex(note => note.url === pageUrl);
   });
 
+  // Get series metadata by slug
+  eleventyConfig.addFilter("getSeriesMeta", function(slug, allSeries) {
+    if (!slug || !allSeries) return null;
+    return allSeries.find(s => s.slug === slug);
+  });
+
   // Add a filter for the current year (useful for copyright)
   eleventyConfig.addFilter("year", () => new Date().getFullYear());
 

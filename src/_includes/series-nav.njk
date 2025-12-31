@@ -1,16 +1,11 @@
 {% set seriesNotes = collections | getSeriesNotes(series) %}
-{% set seriesTitle = "" %}
-{% for s in series %}
-  {% if s.slug == series %}
-    {% set seriesTitle = s.title %}
-  {% endif %}
-{% endfor %}
+{% set seriesMeta = series | getSeriesMeta(allSeries) %}
 
 {% if seriesNotes.length > 1 %}
 <aside class="mb-8 bg-bg-secondary border border-border rounded-lg overflow-hidden">
   <div class="flex items-center justify-between px-4 py-3 border-b border-border">
     <a href="/series/{{ series }}/" class="font-semibold text-text-primary hover:text-accent-400 transition-colors">
-      {{ seriesTitle }}
+      {{ seriesMeta.title }}
     </a>
     <span class="text-xs text-text-muted">{{ seriesNotes.length }} parts</span>
   </div>
