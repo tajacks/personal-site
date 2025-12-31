@@ -6,6 +6,10 @@ layout: base.njk
     <a href="/notes/" class="hover:text-text-secondary transition-colors">&larr; Back to notes</a>
   </nav>
 
+  {% if series is string %}
+    {% include "series-nav.njk" %}
+  {% endif %}
+
   <article>
   <header class="mb-8">
     <h1 class="text-3xl font-bold text-text-primary mb-3">{{ title }}</h1>
@@ -33,6 +37,10 @@ layout: base.njk
   <div class="prose">
     {{ content | safe }}
   </div>
+
+  {% if series is string %}
+    {% include "series-prev-next.njk" %}
+  {% endif %}
 
   {% if related %}
   <footer class="mt-12 pt-8 border-t border-border">

@@ -1,12 +1,14 @@
 ---
 layout: variable-note.njk
-title: "Running Servers"
+title: "Server Setup"
 category: Infrastructure
-description: "How I structure, setup, and maintain my servers"
+description: "Initial setup runbook for new servers"
 tags:
   - infrastructure
   - servers
 created: 2025-12-28
+series: how-i-run
+seriesOrder: 1
 variables:
   - name: ADMIN_USER
     description: "Your admin username (e.g., thomas)"
@@ -514,76 +516,3 @@ Finally, ensure the `root` account doesn't contain any SSH keys in its authorize
 sudo rm /root/.ssh/authorized_keys
 ```
 
-## Install Podman
-
-Podman is a container engine and an alternative to Docker. Install the required packages.
-
-```bash
-apt install podman passt uidmap dbus-user-session systemd-container
-```
-
-Configure subordinate user and group ID ranges for the application user to enable rootless container operation.
-
-```bash
-usermod --add-subuids 100000-165535 "$APP_USER"
-usermod --add-subgids 100000-165535 "$APP_USER"
-```
-
-Allow rootless Podman to bind to privileged ports below 1024.
-
-```bash
-cat > /etc/sysctl.d/99-podman.conf <<'EOF'
-# Allow rootless Podman to bind to privileged ports (< 1024)
-net.ipv4.ip_unprivileged_port_start=80
-EOF
-sysctl --system
-```
-
-Create the Podman storage configuration for the application user.
-
-Create the required directories.
-
-```bash
-mkdir -p "/home/$APP_USER/.config/containers"
-mkdir -p "/home/$APP_USER/.local/share/containers/storage"
-chmod 755 "/home/$APP_USER/.config/containers"
-```
-
-Write the storage configuration file.
-
-```bash
-APP_USER_UID=$(id -u "$APP_USER")
-cat > "/home/$APP_USER/.config/containers/storage.conf" <<EOF
-[storage]
-driver = "overlay"
-runroot = "/run/user/$APP_USER_UID/containers"
-graphroot = "\$HOME/.local/share/containers/storage"
-EOF
-```
-
-Set the correct file permissions and ownership.
-
-```bash
-chmod 644 "/home/$APP_USER/.config/containers/storage.conf"
-chown -R "$APP_USER:$APP_USER" "/home/$APP_USER/.config"
-chown -R "$APP_USER:$APP_USER" "/home/$APP_USER/.local"
-```
-
-Validate the Podman installation by running a test container as the application user. Use `machinectl` to start a login
-shell as the application user with proper systemd user session initialization.
-
-```bash
-machinectl shell "$APP_USER@"
-```
-
-Run a `hello-world` container to ensure Podman is working.
-
-```bash
-podman run --rm hello-world
-```
-
-If successful, you should see a welcome message from the container. Exit the application user's shell.
-
-```bash
-exit
-```
