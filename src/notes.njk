@@ -8,6 +8,26 @@ title: Notes
     My personal wiki. Quick references, code snippets, and things worth remembering.
   </p>
 
+  {% if allSeries | length > 0 %}
+  <section class="mb-12">
+    <h2 class="text-xl font-semibold text-text-primary mb-4">Series</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      {% for s in allSeries %}
+      {% set seriesNotes = collections | getSeriesNotes(s.slug) %}
+      {% if seriesNotes.length > 0 %}
+      <a href="/series/{{ s.slug }}/" class="block p-4 bg-bg-secondary border border-border rounded-lg hover:border-accent-400 transition-colors">
+        <h3 class="font-semibold text-text-primary mb-1">{{ s.title }}</h3>
+        {% if s.description %}
+        <p class="text-sm text-text-muted mb-2">{{ s.description }}</p>
+        {% endif %}
+        <span class="text-xs text-accent-400">{{ seriesNotes.length }} part{% if seriesNotes.length != 1 %}s{% endif %}</span>
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
   {% if collections.notesByCategory | length > 0 %}
   <div class="space-y-8">
     {% for categoryGroup in collections.notesByCategory %}

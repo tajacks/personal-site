@@ -1,0 +1,25 @@
+{% set seriesNotes = collections | getSeriesNotes(series) %}
+{% set seriesMeta = series | getSeriesMeta(allSeries) %}
+
+{% if seriesNotes.length > 1 %}
+<aside class="mb-8 bg-bg-secondary border border-border rounded-lg overflow-hidden">
+  <div class="flex items-center justify-between px-4 py-3 border-b border-border">
+    <a href="/series/{{ series }}/" class="font-semibold text-text-primary hover:text-accent-400 transition-colors">
+      {{ seriesMeta.title }}
+    </a>
+    <span class="text-xs text-text-muted">{{ seriesNotes.length }} parts</span>
+  </div>
+  <ol class="p-4 space-y-2">
+    {% for note in seriesNotes %}
+    <li class="flex items-start gap-3 text-sm">
+      <span class="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs {% if note.url == page.url %}bg-accent-500 text-bg-primary{% else %}bg-bg-tertiary text-text-muted{% endif %}">{{ loop.index }}</span>
+      {% if note.url == page.url %}
+        <span class="text-text-primary font-medium">{{ note.data.title }}</span>
+      {% else %}
+        <a href="{{ note.url }}" class="text-text-muted hover:text-accent-400 transition-colors">{{ note.data.title }}</a>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</aside>
+{% endif %}
