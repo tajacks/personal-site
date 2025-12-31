@@ -55,6 +55,38 @@ export default function(eleventyConfig) {
     return result;
   });
 
+  // Group notes by series
+  eleventyConfig.addCollection("notesBySeries", function(collectionApi) {
+    const notes = collectionApi.getFilteredByGlob("src/notes/*.md");
+    const seriesMap = {};
+
+    notes.forEach(note => {
+      if (note.data.series) {
+        if (!seriesMap[note.data.series]) {
+          seriesMap[note.data.series] = [];
+        }
+        seriesMap[note.data.series].push(note);
+      }
+    });
+
+    // Sort by seriesOrder
+    Object.keys(seriesMap).forEach(slug => {
+      seriesMap[slug].sort((a, b) => (a.data.seriesOrder || 999) - (b.data.seriesOrder || 999));
+    });
+
+    return seriesMap;
+  });
+
+  // Get series notes for a given slug
+  eleventyConfig.addFilter("getSeriesNotes", function(collections, seriesSlug) {
+    if (!seriesSlug || !collections.notesBySeries) return [];
+    return collections.notesBySeries[seriesSlug] || [];
+  });
+
+  // Find current note index in series
+  eleventyConfig.addFilter("findSeriesIndex", function(seriesNotes, pageUrl) {
+    return seriesNotes.findIndex(note => note.url === pageUrl);
+  });
 
   // Add a filter for the current year (useful for copyright)
   eleventyConfig.addFilter("year", () => new Date().getFullYear());
