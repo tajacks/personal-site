@@ -307,70 +307,41 @@ systemctl --user status caddy.service
 If everything went well, and so long as you have a DNS record pointing at this server, you should be able to visit
 `https://$SAMPLE_DOMAIN` in your browser.
 
-RANDOM NOTES
+## Configure Fail2ban
+
+This section is experimental. There are arguments that introducing a `fail2ban` jail for web traffic has limited
+benefits. This said, I currently am trying it, and thus here it is. This will likely change or get removed.
+
+Understand the following risks:
+
+- If you use a CDN, blocking based on the host IP will block your CDN edge servers. Ouch!
+- If you block an IP that uses a commercial VPN node, users who share that IP will be blocked. Double ouch!
+- If you host other services through Caddy that require authentication, and may validly respond with a 403, you may block legitimate traffic. Triple ouch!
+
+That being said...
+
+Bots, scrapers, crawlers, and scanners are a fact of life. Here is a _very small_ snippet of some requests I receive.
 
 ```
-sudo tee /etc/fail2ban/filter.d/caddy.conf << 'EOF'
-[Definition]
-failregex = ^.*"client_ip":"<HOST>".*"status":\s*403.*$
-ignoreregex =
-EOF
-
-sudo tee /etc/fail2ban/jail.d/caddy.local << 'EOF'
-[caddy]
-enabled = true
-port = http,https
-filter = caddy
-logpath = /home/app/caddy/logs/*.log
-maxretry = 3
-findtime = 60
-bantime = 1d
-banaction = iptables-multiport
-EOF
+<ip, request type, path, response code>
+49.12.0.158 GET /wp-content/admin.php 403
+109.61.89.58 GET /wp-includes/js/thickbox/ 403
+109.248.43.162 GET /wp-includes/js/crop/ 403
+109.248.43.117 GET /bb.php 403
+169.150.247.180 GET /wso.php 403
+109.248.43.236 GET /wp-includes/js/thickbox/ 403
+185.111.111.169 GET /alfa.php 403
+185.111.111.172 GET /as.php 403
+109.248.43.179 GET /wp-admin/css/colors/blue/ 403
+78.47.94.156 GET /wso.php 403
+79.127.226.194 GET /info.php 403
+109.248.43.179 GET /as.php 403
 ```
 
-`sudo systemctl restart fail2ban`
+I don't use PHP nor WordPress. This traffic is just garbage from scanners looking for vulnerabilities and open data.
+Recall the very limited security configuration from the Caddyfile.
 
 ```
-app@sandbox:~$ tree
-.
-├── caddy
-│   ├── Caddyfile
-│   ├── config
-│   │   └── caddy
-│   │       └── autosave.json
-│   ├── data
-│   │   └── caddy
-│   │       ├── acme
-│   │       │   └── acme-v02.api.letsencrypt.org-directory
-│   │       │       ├── challenge_tokens
-│   │       │       └── users
-│   │       │           └── default
-│   │       │               ├── default.json
-│   │       │               └── default.key
-│   │       ├── certificates
-│   │       │   └── acme-v02.api.letsencrypt.org-directory
-│   │       │       └── sandbox.thomasjack.ca
-│   │       │           ├── sandbox.thomasjack.ca.crt
-│   │       │           ├── sandbox.thomasjack.ca.json
-│   │       │           └── sandbox.thomasjack.ca.key
-│   │       ├── instance.uuid
-│   │       ├── last_clean.json
-│   │       └── locks
-│   ├── logs
-│   │   └── sandbox.thomasjack.ca.log
-│   └── sites
-│       └── sandbox.thomasjack.ca.caddyfile
-└── www
-└── sandbox.thomasjack.ca
-└── index.html
-```
-
-```caddy
-{
-        admin localhost:2019
-}
-
 (security) {
         @blocked {
                 path /wp-* /wordpress/* /xmlrpc.php
@@ -385,40 +356,64 @@ app@sandbox:~$ tree
         }
         respond @blocked 403
 }
-
-(logging) {
-        log {
-                output file /home/app/caddy/logs/{args[0]}.log {
-                        roll_size 25MiB
-                        roll_keep 10
-                        roll_keep_for 7d
-                }
-                format json
-        }
-}
-
-(static) {
-        import logging {args[0]}
-        import security
-
-        root * /home/app/www/{args[0]}
-        file_server
-}
-
-(proxy) {
-        import logging {args[0]}
-        import security
-
-        reverse_proxy {args[1]}
-}
-
-import sites/*.caddyfile
 ```
 
+This is far from a comprehensive block list, however, the intention here is to detect requests which are obviously wrong
+based on the technologies I use and known attempted exploit paths. This directive, when used, instructs Caddy to respond
+to requests that match these paths with a `403` (Forbidden) status. We can configure `fail2ban` to block hosts which 
+request these paths too frequently at the host firewall level.
+
+Execute these commands as the `$ADMIN_USER`.
+
+Create a filter to look for 403 responses.
+
+```bash
+sudo tee /etc/fail2ban/filter.d/caddy.conf > /dev/null <<'EOF'
+[Definition]
+failregex = ^.*"client_ip":"<HOST>".*"status":\s*403.*$
+ignoreregex =
+EOF
+```
+
+Create a new jail configuration named `caddy`.
+
+```bash
+sudo tee /etc/fail2ban/jail.d/caddy.local > /dev/null <<'EOF'
+[caddy]
+enabled = true
+port = http,https
+filter = caddy
+logpath = /home/app/caddy/logs/*.log
+maxretry = 3
+findtime = 60
+bantime = 1d
+banaction = iptables-multiport
+EOF
+```
+
+Restart `fail2ban`.
+
+```bash
+sudo systemctl restart fail2ban
+```
+
+Ensure the configuration was picked up properly.
+
+```bash
+sudo fail2ban-client status caddy
+```
+
+After some time, you'll probably start to see hosts being blocked.
 
 ```
-app@sandbox:~/caddy$ cat sites/sandbox.thomasjack.ca.caddyfile
-sandbox.thomasjack.ca {
-        import static sandbox.thomasjack.ca
-}
+tjack@host:~$ sudo fail2ban-client status caddy
+Status for the jail: caddy
+|- Filter
+|  |- Currently failed: 0
+|  |- Total failed:     55
+|  `- File list:        /home/app/caddy/logs/thomasjack.ca.log
+`- Actions
+   |- Currently banned: 13
+   |- Total banned:     14
+   `- Banned IP list:   94.130.222.48 4.194.133.126 74.225.136.96 20.184.35.52 74.176.56.30 13.74.146.113 4.190.203.84 52.147.68.81 74.176.59.137 4.194.52.158 213.202.253.4 217.182.64.155 4.197.176.45
 ```
