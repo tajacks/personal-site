@@ -1,5 +1,5 @@
 ---
-layout: note.njk
+layout: variable-note.njk
 title: "Running Caddy"
 category: Infrastructure
 description: "Installation and configuration of the Caddy webserver"
@@ -10,12 +10,62 @@ tags:
 created: 2025-12-31
 series: how-i-run
 seriesOrder: 2
+variables:
+  - name: ADMIN_USER
+    description: "Your admin username (e.g., tjack)"
+  - name: APP_USER
+    description: "Application user name (e.g., app)"
+  - name: SAMPLE_DOMAIN
+    description: "The domain that will host the sample website served by Caddy (e.g. sandbox.thomasjack.ca)"
 ---
-
-## Install Caddy
 
 Caddy is my webserver of choice. I find it easier to manage upgrades, format configuration files, and generally reason
 about the service when it is installed on the host directly, not in a container.
+
+## Architecture
+
+Caddy will be run as `$APP_USER`. Systemd lingering must be enabled for this user - this should already be done
+if following the setup instructions in this series. 
+
+The following directory structures will be created.
+
+### Caddy
+
+```
+├── caddy
+│   ├── Caddyfile // Main configuration file
+│   ├── config
+│   │   └── // Directory content managed by Caddy
+│   ├── data 
+│   │   └── // Directory content managed by Caddy
+│   ├── logs
+│   │   └── name.of.site.log // One logfile per domain
+│   └── sites
+│       └── sandbox.thomasjack.ca.caddyfile // One configuration file per domain
+└── www
+    └── sandbox.thomasjack.ca // Site content under www/domain.of.site
+        └── index.html
+```
+
+In brief, the Caddyfile contains reusable configuration snippets which are read by individual configurations under the 
+`sites` directory. This keeps centralized configuration in one file (Caddyfile) while allowing individual sites to use
+or override those values in their own file.
+
+I like keeping the site files separate from the Caddyfile so I can check them into version control in their own
+repositories, reason about them individually, etc. 
+
+### Web Content
+
+```
+└── www
+    └── sandbox.thomasjack.ca // One directory named per domain
+        └── index.html
+```
+
+The static website content layout is simple - one directory per domain, sharing the name of that domain, with static
+content beneath it.
+
+## Install
 
 As `$ADMIN_USER`, install prerequisites for Caddy.
 
@@ -25,14 +75,14 @@ debian-keyring \
 debian-archive-keyring
 ```
 
-Import Caddy's signing key and create the an `apt` source.
+Import Caddy's signing key and create an `apt` source.
 
 ```bash
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
 ```
 
-Set the correct file permissions.
+Set the correct file modes.
 
 ```bash
 sudo chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
@@ -51,13 +101,15 @@ Install Caddy.
 sudo apt install caddy
 ```
 
-Stop and disable the system service for Caddy - we will run it under `$APP_USER`.
+Stop and disable the generated systemd service for Caddy - we will run it under `$APP_USER`. "Masking" symlinks the 
+global Caddy unit file to `/dev/null`, effectively preventing it from being started.
 
 ```bash
 sudo systemctl disable --now caddy
+sudo systemctl mask caddy
 ```
 
-Ensure that Caddy is stopped. Caddy should be reported as `Active: inactive (dead)`.
+Ensure that Caddy is stopped. Caddy should be reported as `masked (Reason: Unit caddy.service is masked.)`.
 
 ```bash
 sudo systemctl status caddy
@@ -76,42 +128,138 @@ Become the application user for the remainder of this section.
 sudo machinectl shell "$APP_USER@"
 ```
 
+### Create Web Content
+
+This section will create some static placeholder web content to be served at `$SAMPLE_DOMAIN`. This is important to
+ensure that Caddy is operating as expected.
+
+Make the `www` directory, where all web content will be served from. Also create the domain specific directory.
+
+```bash
+mkdir -p ~/www/$SAMPLE_DOMAIN
+```
+
+Create a basic index page to server as placeholder content.
+
+```bash
+cat > ~/www/$SAMPLE_DOMAIN/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f5f5f5;
+        }
+        main {
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Hello World</h1>
+        <p>Caddy is running.</p>
+    </main>
+</body>
+</html>
+EOF
+```
+
 ### Create Caddy Configuration
 
 Create the directory structure.
 
 ```bash
-mkdir -p ~/caddy/data
 mkdir -p ~/caddy/config
-mkdir -p ~/www
+mkdir -p ~/caddy/data
+mkdir -p ~/caddy/logs
+mkdir -p ~/caddy/sites
 ```
 
 Set the correct file permissions.
 
 ```bash
-chmod 700 ~/caddy/data
 chmod 700 ~/caddy/config
+chmod 700 ~/caddy/data
+chmod 700 ~/caddy/logs
+chmod 700 ~/caddy/sites
 ```
 
-Create a basic, sample, Caddy configuration file (Caddyfile).
+Create the base Caddyfile with reusable snippets defined.
 
 ```bash
-# Create Caddyfile
 cat > ~/caddy/Caddyfile <<'EOF'
 {
-    admin localhost:2019
+        admin localhost:2019
 }
 
-# Example static site
-# example.com {
-#     root * /home/app/www/demo
-#     file_server
-# }
+(security) {
+        @blocked {
+                path /wp-* /wordpress/* /xmlrpc.php
+                path /.env /.env.* /.git /.git/* /.svn /.svn/* /.hg /.hg/*
+                path /.aws/* /.docker/* /config.json
+                path /phpmyadmin/* /phpMyAdmin/* /adminer* /cgi-bin/*
+                path /vendor/phpunit/* /eval-stdin.php
+                path *.php *.asp *.aspx *.jsp
+                path /alfa* /c99* /r57* /shell* /cmd* /upload*
+                path /wlwmanifest.xml /tinymce/* /filemanager/*
+                path */passwd */shadow */etc/shadow */etc/passwd
+        }
+        respond @blocked 403
+}
 
-# Example reverse proxy
-# api.example.com {
-#     reverse_proxy localhost:8080
-# }
+(logging) {
+        log {
+                output file /home/app/caddy/logs/{args[0]}.log {
+                        roll_size 25MiB
+                        roll_keep 10
+                        roll_keep_for 7d
+                }
+                format json
+        }
+}
+
+(static) {
+        import logging {args[0]}
+        import security
+
+        root * /home/app/www/{args[0]}
+        file_server
+}
+
+(proxy) {
+        import logging {args[0]}
+        import security
+
+        reverse_proxy {args[1]}
+}
+
+import sites/*.caddyfile
+EOF
+```
+
+Create a placeholder site configuration.
+
+```bash
+cat > ~/caddy/sites/$SAMPLE_DOMAIN.caddyfile <<EOF
+$SAMPLE_DOMAIN {
+        import static $SAMPLE_DOMAIN
+}
 EOF
 ```
 
@@ -156,6 +304,8 @@ Ensure Caddy is running
 systemctl --user status caddy.service
 ```
 
+If everything went well, and so long as you have a DNS record pointing at this server, you should be able to visit
+`https://$SAMPLE_DOMAIN` in your browser.
 
 RANDOM NOTES
 

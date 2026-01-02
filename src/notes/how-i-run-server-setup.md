@@ -11,7 +11,7 @@ series: how-i-run
 seriesOrder: 1
 variables:
   - name: ADMIN_USER
-    description: "Your admin username (e.g., thomas)"
+    description: "Your admin username (e.g., tjack)"
   - name: ADMIN_USER_COMMENT
     description: "Full name or description for admin user"
   - name: ADMIN_SSH_KEY
