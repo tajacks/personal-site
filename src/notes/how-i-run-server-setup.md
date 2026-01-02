@@ -11,7 +11,7 @@ series: how-i-run
 seriesOrder: 1
 variables:
   - name: ADMIN_USER
-    description: "Your admin username (e.g., thomas)"
+    description: "Your admin username (e.g., tjack)"
   - name: ADMIN_USER_COMMENT
     description: "Full name or description for admin user"
   - name: ADMIN_SSH_KEY
@@ -116,11 +116,13 @@ Install some core and generally useful software packages onto the server.
 | git                 | Version control system         |
 | gnupg               | Encryption and signing toolkit |
 | htop                | Interactive process viewer     |
+| jq                  | JSON processor                 |
 | lsb-release         | Linux distribution identifier  |
 | net-tools           | Network utilities              |
 | rsync               | File synchronization tool      |
 | rsyslog             | System logging daemon          |
 | sysstat             | System performance tools       |
+| systemd-container   | Systemd container tools        |
 | tree                | Directory listing tool         |
 | ufw                 | Host-based firewall            |
 | unattended-upgrades | Automatic security updates     |
@@ -134,11 +136,13 @@ fail2ban \
 git \
 gnupg \
 htop \
+jq \
 lsb-release \
 net-tools \
 rsync \
 rsyslog \
 sysstat \
+systemd-container \
 tree \
 ufw \
 unattended-upgrades \
@@ -515,4 +519,3 @@ Finally, ensure the `root` account doesn't contain any SSH keys in its authorize
 ```bash
 sudo rm /root/.ssh/authorized_keys
 ```
-

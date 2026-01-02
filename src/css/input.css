@@ -114,15 +114,22 @@
   }
 
   .prose ul {
-    @apply mb-6 space-y-2 list-disc list-inside;
+    @apply mb-6 space-y-2 list-disc pl-6;
   }
 
   .prose ol {
-    @apply mb-6 space-y-2 list-decimal list-inside;
+    @apply mb-6 space-y-2 list-decimal pl-6;
   }
 
   .prose li {
     @apply text-text-secondary;
+  }
+
+  .prose ul ul,
+  .prose ol ol,
+  .prose ul ol,
+  .prose ol ul {
+    @apply mt-2 mb-0 pl-6;
   }
 
   .prose em {
