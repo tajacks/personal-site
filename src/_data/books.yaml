@@ -3,6 +3,26 @@
 # category: fiction, technical, self-help, philosophy, non-fiction, science, food-drink
 # year: YYYY or omit if you don't remember when you read it
 
+# 2017
+- title: "Siddhartha"
+  author: "Herman Hesse"
+  year: 2017
+  status: finished
+  category: fiction
+
+# 2020
+- title: "Homo Deus: A Brief History of Tomorrow"
+  author: "Yuval Noah Harari"
+  year: 2020
+  status: finished
+  category: non-fiction
+
+- title: "The Beauty of Everyday Things"
+  author: "Soetsu Yanagi"
+  year: 2020
+  status: finished
+  category: philosophy
+
 # 2022
 - title: "Modern Java in Action"
   author: "Raoul-Gabriel Urma, Mario Fusco, and Alan Mycroft"
@@ -37,12 +57,6 @@
   category: self-help
 
 # 2025
-- title: "Thinking, Fast and Slow"
-  author: "Daniel Kahneman"
-  year: 2025
-  status: reading
-  category: self-help
-
 - title: "The Overstory"
   author: "Richard Powers"
   year: 2025
@@ -55,6 +69,31 @@
   status: finished
   category: self-help
 
+# 2026
+- title: "Thinking, Fast and Slow"
+  author: "Daniel Kahneman"
+  year: 2026
+  status: finished
+  category: non-fiction 
+
+- title: "The Colour of Magic"
+  author: "Terry Pratchett"
+  year: 2026
+  status: finished
+  category: fiction
+
+- title: "Nexus"
+  author: "Yuval Noah Harari"
+  year: 2026
+  status: reading
+  category: non-fiction
+
+- title: "The Joy of Kotlin"
+  author: "Pierre-Yves Saumont"
+  year: 2026
+  status: reading
+  category: technical
+
 # Date Unknown
 - title: "Sapiens: A Brief History of Humankind"
   author: "Yuval Noah Harari"
@@ -65,21 +104,6 @@
   author: "Yuval Noah Harari"
   status: finished
   category: philosophy
-
-- title: "Homo Deus: A Brief History of Tomorrow"
-  author: "Yuval Noah Harari"
-  status: finished
-  category: non-fiction
-
-- title: "What If? Serious Scientific Answers to Absurd Hypothetical Questions"
-  author: "Randall Munroe"
-  status: finished
-  category: science
-
-- title: "What If? 2: Additional Serious Scientific Answers to Absurd Hypothetical Questions"
-  author: "Randall Munroe"
-  status: finished
-  category: science
 
 - title: "Craft Coffee: A Manual"
   author: "Jessica Easto"
@@ -100,11 +124,6 @@
   author: "Norton Juster"
   status: finished
   category: fiction
-
-- title: "The Beauty of Everyday Things"
-  author: "Soetsu Yanagi"
-  status: finished
-  category: philosophy
 
 - title: "The Hitchhiker's Guide to the Galaxy"
   author: "Douglas Adams"
