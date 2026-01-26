@@ -79,8 +79,20 @@
 - title: "The Colour of Magic"
   author: "Terry Pratchett"
   year: 2026
-  status: reading
+  status: finished
   category: fiction
+
+- title: "Nexus"
+  author: "Yuval Noah Harari"
+  year: 2026
+  status: reading
+  category: non-fiction
+
+- title: "The Joy of Kotlin"
+  author: "Pierre-Yves Saumont"
+  year: 2026
+  status: reading
+  category: technical
 
 # Date Unknown
 - title: "Sapiens: A Brief History of Humankind"
