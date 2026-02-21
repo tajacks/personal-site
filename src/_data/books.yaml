@@ -82,6 +82,24 @@
   status: finished
   category: fiction
 
+- title: "The Light Fantastic"
+  author: "Terry Pratchett"
+  year: 2026
+  status: finished
+  category: fiction
+
+- title: "Equal Rites"
+  author: "Terry Pratchett"
+  year: 2026
+  status: finished
+  category: fiction
+
+- title: "Mort"
+  author: "Terry Pratchett"
+  year: 2026
+  status: reading
+  category: fiction
+
 - title: "Nexus"
   author: "Yuval Noah Harari"
   year: 2026
