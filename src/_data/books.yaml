@@ -82,6 +82,24 @@
   status: finished
   category: fiction
 
+- title: "The Light Fantastic"
+  author: "Terry Pratchett"
+  year: 2026
+  status: finished
+  category: fiction
+
+- title: "Equal Rites"
+  author: "Terry Pratchett"
+  year: 2026
+  status: finished
+  category: fiction
+
+- title: "Mort"
+  author: "Terry Pratchett"
+  year: 2026
+  status: finished
+  category: fiction
+
 - title: "Nexus"
   author: "Yuval Noah Harari"
   year: 2026
@@ -90,6 +108,12 @@
 
 - title: "The Joy of Kotlin"
   author: "Pierre-Yves Saumont"
+  year: 2026
+  status: finished
+  category: technical
+
+- title: "Kotlin in Action, Vol. 2"
+  author: "Sebastian Aigner, Roman Elizarov, Svetlana Isakova, and Dmitry Jemerov"
   year: 2026
   status: reading
   category: technical
