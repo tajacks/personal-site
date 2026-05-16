@@ -7,11 +7,19 @@ basics:
 
 experience:
   - title: "Principal Engineer"
+    team: "Global IT Risk Transformation"
+    company: "RBC"
+    location: "Toronto, ON"
+    start: "2026-02"
+    end: null  # null means current/present
+    overview: "Guide and develop the engineering practices for a transformational risk application."
+
+  - title: "Principal Engineer"
     team: "Marketplace"
     company: "Houseful (RBCx)"
     location: "Toronto, ON"
     start: "2025-05"
-    end: null  # null means current/present
+    end: "2026-02"
     overview: "Led the technical implementation of a complete platform migration with near-zero downtime. Implemented OAuth authentication and standard security controls that uplifted services while retaining business-critical features."
 
   - title: "Sr. Software Engineer"
