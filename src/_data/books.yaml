@@ -112,11 +112,17 @@
   status: finished
   category: technical
 
-- title: "Kotlin in Action, Vol. 2"
-  author: "Sebastian Aigner, Roman Elizarov, Svetlana Isakova, and Dmitry Jemerov"
+- title: "The Name of the Wind"
+  author: "Patrick Rothfuss"
   year: 2026
-  status: reading
-  category: technical
+  status: finished
+  category: fiction
+
+- title: "Wool"
+  author: "Hugh Howey"
+  year: 2026
+  status: finished
+  category: fiction
 
 # Date Unknown
 - title: "Sapiens: A Brief History of Humankind"
